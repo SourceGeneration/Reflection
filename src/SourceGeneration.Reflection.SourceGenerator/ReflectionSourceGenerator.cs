@@ -234,6 +234,8 @@ namespace System.Runtime.CompilerServices
                 CanRead = property.GetMethod != null,
                 CanWrite = property.SetMethod != null,
                 IsInitOnly = property.SetMethod?.IsInitOnly == true,
+                GetMethodAccessibility = property.GetMethod?.DeclaredAccessibility ?? Accessibility.NotApplicable,
+                SetMethodAccessibility = property.SetMethod?.DeclaredAccessibility ?? Accessibility.NotApplicable,
                 PropertyType = property.Type.ToDisplayString(GlobalTypeDisplayFormat),
             };
 
@@ -393,12 +395,12 @@ namespace System.Runtime.CompilerServices
                                             !type.IsRefLikeType &&
                                             property.Accessibility != Accessibility.Private && property.Accessibility != Accessibility.Protected)
                                         {
-                                            if (property.CanRead)
+                                            if (property.CanRead && property.GetMethodAccessibility != Accessibility.Private && property.GetMethodAccessibility != Accessibility.Protected)
                                             {
                                                 builder.AppendLine($@"GetValue = instance => (({type.FullName})instance).{property.Name},");
                                             }
 
-                                            if (!type.IsStruct && !property.IsInitOnly && property.CanWrite)
+                                            if (!type.IsStruct && !property.IsInitOnly && property.CanWrite && property.SetMethodAccessibility != Accessibility.Private && property.SetMethodAccessibility != Accessibility.Protected)
                                             {
                                                 builder.AppendLine($@"SetValue = (instance, value) => (({type.FullName})instance).{property.Name} = ({property.PropertyType})value");
                                             }
@@ -446,6 +448,12 @@ namespace System.Runtime.CompilerServices
                                         {
                                             builder.AppendIndent();
                                             builder.Append("Invoke = (instance, parameters) => ");
+
+                                            if(method.ReturnType == "void")
+                                            {
+                                                builder.Append("{ ");
+                                            }
+
                                             if (method.IsStatic)
                                             {
                                                 builder.Append($"{type.FullName}.{method.Name}(");
@@ -464,6 +472,12 @@ namespace System.Runtime.CompilerServices
                                                 }
                                             }
                                             builder.Append(")");
+
+                                            if (method.ReturnType == "void")
+                                            {
+                                                builder.Append("; return null; }");
+                                            }
+
                                             builder.AppendLine();
                                         }
 

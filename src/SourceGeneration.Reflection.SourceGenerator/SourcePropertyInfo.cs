@@ -32,6 +32,8 @@ internal class SourcePropertyInfo
     public bool IsInitOnly;
     public Accessibility Accessibility;
     public NullableAnnotation NullableAnnotation;
+    public Accessibility GetMethodAccessibility;
+    public Accessibility SetMethodAccessibility;
 }
 
 internal class SourceMethodBase
