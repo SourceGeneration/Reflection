@@ -1,65 +1,36 @@
-﻿// See https://aka.ms/new-console-template for more information
-using SourceGeneration.Reflection;
+﻿using SourceGeneration.Reflection;
 
-var type = SourceReflector.GetType(typeof(Model))!;
+var type = SourceReflector.GetType(typeof(Goods))!;
 
-Model model = new()
-{
-    Name = "a"
-};
+// Get default ConstructorInfo and create a instance
+var goods = (Goods)type.GetConstructor([])!.Invoke([]);
 
-// ouput "a"
-Console.WriteLine(type.GetField("Constant")!.GetValue(null));
+// Get PropertyInfo and set value
+type.GetProperty("Id")!.SetValue(goods, 1); // private property
+type.GetProperty("Name")!.SetValue(goods, "book"); // private property setter
+type.GetProperty("Price")!.SetValue(goods, 3.14); // public property
 
-// ouput "a"
-Console.WriteLine(type.GetProperty("Name")!.GetValue(model));
+// Output book
+Console.WriteLine(goods.Name);
+// Output 1
+Console.WriteLine(type.GetProperty("Id")!.GetValue(goods));
+// Output 3.14
+Console.WriteLine(goods.Price);
 
-// output "b"
-type.GetProperty("Name")!.SetValue(model, "b");
-Console.WriteLine(type.GetProperty("Name")!.GetValue(model));
-
-// output 1
-Console.WriteLine(type.GetField("_field")!.GetValue(model));
-
-// output 2
-type.GetField("_field")!.SetValue(model, 2);
-Console.WriteLine(type.GetField("_field")!.GetValue(model));
-
-// output 3
-Console.WriteLine(type.GetMethod("Add")!.Invoke(model, [1, 2]));
-
-// output 3
-Console.WriteLine(type.GetMethod("StaticAdd")!.Invoke(null, [1, 2]));
-
-var newModel =(Model)type.GetConstructor([typeof(int), typeof(string)])!.Invoke([1, "abc"]);
-// output abc
-Console.WriteLine(newModel.Name);
-// output 1
-Console.WriteLine(newModel.No);
-
-Console.ReadLine();
-
+// Get MethodInfo and invoke
+type.GetMethod("Discount")!.Invoke(goods, [0.5]);
+// Output 1.57
+Console.WriteLine(goods.Price);
 
 [SourceReflection]
-public class Model
+public class Goods
 {
-    const string Constant = "Hello SourceReflection";
+    private int Id { get; set; }
+    public string? Name { get; private set; }
+    public double Price { get; set; }
 
-    public int No { get; set; }
-    public string? Name { get; set; }
-
-    private int _field = 1;
-
-    private Model(int no, string name)
+    internal void Discount(double discount)
     {
-        No = no;
-        Name = name;
+        Price = Price * discount;
     }
-
-    public Model() { }
-
-    public int Add(int a, int b) => a + b;
-
-    private static int StaticAdd(int a, int b) => a + b;
-
 }

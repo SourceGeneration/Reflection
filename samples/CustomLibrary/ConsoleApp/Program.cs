@@ -1,4 +1,7 @@
-﻿using SourceGeneration.Reflection;
+﻿using CustomLibrary1;
+using CustomLibrary2;
+using SourceGeneration.Reflection;
+using System.ComponentModel.DataAnnotations;
 
 var types = SourceReflector.GetTypes();
 
@@ -8,3 +11,17 @@ foreach (var type in types)
 }
 
 Console.ReadLine();
+
+[SourceReflection]
+public class A { }
+
+[YourReflection]
+public class B { }
+
+[YourOtherReflection]
+public class C { }
+
+[Display]
+public class E { }
+
+public class D { }
