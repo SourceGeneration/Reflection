@@ -2,9 +2,9 @@
 
 ## Why
 
-随着.NET的发展，越来越多的应用有AOT Native的需要，但反射和动态代码阻碍了AOT的发布，`Source generator`可以很好的解决该问题，例如`System.Json.Text`通过`Source generator`处理对象的序列化，但都针对具体的业务进行实现无法通用化，类似的情况还有很多。
+With the development of .NET, there is an increasing need for AOT Native in many applications. However, reflection and dynamic code pose obstacles to AOT deployment. `Source generators` can effectively this issue. For example, `System.Json.Text` uses a `Source generator` to handle object serialization. However, these implementations are specific to individual businesses and cannot be easily generalized.
 
-SourceReflection 希望提供一种更为通用的方式，为更多的开发人员提供 AOTable Reflection 支持，而无需重复编写 Source generator。
+SourceReflection aims to provide a more universal solution, offering `AOTable` Reflection support to more developers without the need for repetitive source generator implementation.
 
 ## Supports
 
@@ -63,7 +63,7 @@ Console.WriteLine(goods.Price);
 
 ## I don't want use SourceReflectionAttribute
 
-Yes, you can reflection without `SourceReflectionAttribute`
+Uou can reflection without `SourceReflectionAttribute`
 
 Define your class whitout attribute
 
@@ -94,11 +94,11 @@ type.GetProperty("Price").SetValue(goods, 3.14); // public property
 type.GetMethod("Discount").Invoke(goods, 0.5);
 ```
 
-It's aot publish working, `DynamicallyAccessedMembers` allows tools to understand which members are being accessed during the execution of a program. 
+It can work properly after AOT compilation. `DynamicallyAccessedMembers` allows tools to understand which members are being accessed during the execution of a program. 
 
 ## Use Custom Attribute
 
-You can define a custom attribute to tell SourceReflector what do you want
+You can create a custom attribute to indicate to the source generator which types need to be reflected. 
 
 Edit your project `.csproj`
 ```xml
@@ -113,7 +113,7 @@ Edit your project `.csproj`
 	<CompilerVisibleProperty Include="DisplaySourceReflectionAttribute" />
 </ItemGroup>
 ```
-Then you can use `DisplayAttribute` to tell generator you need reflect it
+Now you can use the `DisplayAttribute` to inform the source generator that you need to reflect it.
 ```c#
 [System.ComponentModel.DataAnnotations.Display]
 public class Goods
@@ -123,3 +123,20 @@ public class Goods
     public double Price { get; set; }
 }
 ```
+
+## Samples
+
+### HelloWorld
+
+[HelloWord](https://github.com/SourceGeneration/Reflection/tree/main/samples/HelloWorld) example demonstrates some basic uses of SourceReflection.
+
+### CsvWriter
+
+[CsvWriter](https://github.com/SourceGeneration/Reflection/tree/main/samples/CsvWriter) is a aotable sample library, it provider only one method to export `.csv` file 
+```C#
+CsvUtility.Write("test.csv", models);
+```
+
+### CustomLibrary
+
+[CustomLibrary](https://github.com/SourceGeneration/Reflection/tree/main/samples/CustomLibrary) example demonstrates how to use SourceReflection to publish your NuGet package and propagate your attributes.
