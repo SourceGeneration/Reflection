@@ -8,7 +8,7 @@
 
 ## Why
 
-With the development of .NET, there is an increasing need for AOT Native in many applications. However, reflection and dynamic code pose obstacles to AOT deployment. `Source generators` can effectively this issue. For example, `System.Json.Text` uses a `Source generator` to handle object serialization. However, these implementations are specific to individual businesses and cannot be easily generalized.
+With the development of .NET, there is an increasing need for AOT Native in many applications. However, reflection and dynamic code pose obstacles to AOT deployment. `Source generators` can effectively this issue. For example, `System.Text.Json` uses a `Source generator` to handle object serialization. However, these implementations are specific to individual businesses and cannot be easily generalized.
 
 SourceReflection aims to provide a more universal solution, offering `AOTable` Reflection support to more developers without the need for repetitive source generator implementation.
 
