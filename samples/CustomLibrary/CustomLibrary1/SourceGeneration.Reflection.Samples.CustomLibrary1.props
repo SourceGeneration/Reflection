@@ -1,0 +1,8 @@
+<Project>
+	<PropertyGroup>
+		<CustomLibrary1SourceReflectionAttribute>CustomLibrary1.YourReflectionAttribute</CustomLibrary1SourceReflectionAttribute>
+	</PropertyGroup>
+	<ItemGroup>
+		<CompilerVisibleProperty Include="CustomLibrary1SourceReflectionAttribute" />
+	</ItemGroup>
+</Project>

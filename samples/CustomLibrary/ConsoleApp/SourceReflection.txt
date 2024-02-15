@@ -1,0 +1,2 @@
+﻿@type System.DateTime
+@type SourceGeneration.Reflection.Sample2.D

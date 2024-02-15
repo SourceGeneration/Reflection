@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<LangVersion>12</LangVersion>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageOutputPath>./../../../../nupkg</PackageOutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SourceGeneration.Reflection" Version="1.0.0-beta1.240214.1" />
+		<None Update="SourceGeneration.Reflection.Samples.CustomLibrary2.props">
+			<PackagePath>build</PackagePath>
+			<Pack>true</Pack>
+		</None>
+	</ItemGroup>
+
+</Project>

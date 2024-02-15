@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;net5.0;net6.0;net7.0;net8.0</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<LangVersion>12</LangVersion>
+		<SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+
+		<Version>1.0.0-beta1.240215.1</Version>
+
+		<Authors>SourceGeneration</Authors>
+		<Description>Reflection with source generator</Description>
+		<PackageTags>reflection,aot,source generator</PackageTags>
+		
+		<RepositoryUrl>https://github.com/SourceGeneration/Reflection</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/SourceGeneration/Reflection</PackageProjectUrl>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageOutputPath>./../../../nupkg</PackageOutputPath>
+		<PackageIcon>sg.png</PackageIcon>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include=".\..\..\sg.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+			<Visible>false</Visible>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SourceGeneration.Reflection.SourceGenerator\SourceGeneration.Reflection.SourceGenerator.csproj" />
+	</ItemGroup>
+
+</Project>
