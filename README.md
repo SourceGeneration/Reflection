@@ -1,4 +1,10 @@
+
+
 # SourceReflection
+
+<div>
+  <a href="https://www.nuget.org/packages/SourceGeneration.Reflection/"><img src="https://img.shields.io/nuget/vpre/SourceGeneration.Reflection?style=for-the-badge&color=0065b3"></a>
+</div>
 
 ## Why
 
@@ -12,6 +18,18 @@ SourceReflection aims to provide a more universal solution, offering `AOTable` R
 - Property
 - Method
 - Constructor
+
+## Setup
+
+```powershell
+dotnet add package SourceGeneration.Reflection --version 1.0.0-beta1.240215.1
+```
+
+```xml
+<ItemGroup>
+  <PackageReference Include="SourceGeneration.Reflection" Version="1.0.0-beta1.240215.1" />
+</ItemGroup>
+```
 
 ## Start
 
@@ -51,12 +69,12 @@ type.GetProperty("Price").SetValue(goods, 3.14); // public property
 // Output book
 Console.WriteLine(goods.Name);
 // Output 1
-Console.WriteLine(goods.Id);
+Console.WriteLine(type.GetProperty("Id").GetValue(goods));
 // Output 3.14
 Console.WriteLine(goods.Price);
 
 // Get MethodInfo and invoke
-type.GetMethod("Discount").Invoke(goods, 0.5);
+type.GetMethod("Discount").Invoke(goods, [0.5]);
 // Output 1.57
 Console.WriteLine(goods.Price);
 ```
@@ -91,7 +109,7 @@ var goods = (Goods)type.GetConstructor([]).Invoke([]);
 type.GetProperty("Id").SetValue(goods, 1); // private property
 type.GetProperty("Name").SetValue(goods, "book"); // private property setter
 type.GetProperty("Price").SetValue(goods, 3.14); // public property
-type.GetMethod("Discount").Invoke(goods, 0.5);
+type.GetMethod("Discount").Invoke(goods, [0.5]);
 ```
 
 It can work properly after AOT compilation. `DynamicallyAccessedMembers` allows tools to understand which members are being accessed during the execution of a program. 
@@ -104,13 +122,13 @@ Edit your project `.csproj`
 ```xml
 <!-- define your Attribute -->
 <PropertyGroup>
-	<DisplaySourceReflectionAttribute>System.ComponentModel.DataAnnotations.DisplayAttribute</DisplaySourceReflectionAttribute>
+  <DisplaySourceReflectionAttribute>System.ComponentModel.DataAnnotations.DisplayAttribute</DisplaySourceReflectionAttribute>
 </PropertyGroup>
 
 <!-- set property visible  -->
 <!-- property name must be endswith 'SourceReflectionAttribute'  -->
 <ItemGroup>
-	<CompilerVisibleProperty Include="DisplaySourceReflectionAttribute" />
+  <CompilerVisibleProperty Include="DisplaySourceReflectionAttribute" />
 </ItemGroup>
 ```
 Now you can use the `DisplayAttribute` to inform the source generator that you need to reflect it.
