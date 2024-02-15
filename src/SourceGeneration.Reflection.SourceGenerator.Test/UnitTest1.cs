@@ -17,16 +17,17 @@ namespace SourceGeneration.Reflection.Sample2
     public class D 
     {  
 
-const string A = ""abc"";
-const string B = A;
-            public string name;
-    private string a;
+public string A {get; private set;}
+internal void Add(){}
+        public int Add(int x) => x + 1;
     }
 }
 ";
             var result = CSharpTestGenerator.Generate<ReflectionSourceGenerator>(source, typeof(SourceReflectionAttribute).Assembly);
             var script = result.RunResult.GeneratedTrees.FirstOrDefault()?.GetText();
             var script2 = result.RunResult.GeneratedTrees.LastOrDefault()?.GetText();
+            
         }
     }
 }
+
