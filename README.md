@@ -2,9 +2,7 @@
 
 # SourceReflection
 
-<div>
-  <a href="https://www.nuget.org/packages/SourceGeneration.Reflection/"><img src="https://img.shields.io/nuget/vpre/SourceGeneration.Reflection?style=for-the-badge&color=0065b3"></a>
-</div>
+[![NuGet](https://img.shields.io/nuget/vpre/SourceGeneration.Reflection.svg)](https://www.nuget.org/packages/SourceGeneration.Reflection)
 
 ## Why
 
@@ -19,21 +17,18 @@ SourceReflection aims to provide a more universal solution, offering `AOTable` R
 - Method
 - Constructor
 
-## Setup
+## Installing Reflection
 
+```powershell
+Install-Package SourceGeneration.Reflection -Version 1.0.0-beta1.240215.1
+```
 ```powershell
 dotnet add package SourceGeneration.Reflection --version 1.0.0-beta1.240215.1
 ```
 
-```xml
-<ItemGroup>
-  <PackageReference Include="SourceGeneration.Reflection" Version="1.0.0-beta1.240215.1" />
-</ItemGroup>
-```
-
 ## Start
 
-Define your class
+Add `SourceReflectionAttribute` to your class
 ```c#
 using SourceGeneration.Reflection;
 
@@ -79,11 +74,9 @@ type.GetMethod("Discount").Invoke(goods, [0.5]);
 Console.WriteLine(goods.Price);
 ```
 
-## I don't want use SourceReflectionAttribute
+## Without Attribute
 
-Uou can reflection without `SourceReflectionAttribute`
-
-Define your class whitout attribute
+You can also without using `SourceReflectionAttribute` for reflection
 
 ```c#
 public class Goods
@@ -144,17 +137,8 @@ public class Goods
 
 ## Samples
 
-### HelloWorld
+- [HelloWord](https://github.com/SourceGeneration/Reflection/tree/main/samples/HelloWorld) example demonstrates some basic uses of SourceReflection.
 
-[HelloWord](https://github.com/SourceGeneration/Reflection/tree/main/samples/HelloWorld) example demonstrates some basic uses of SourceReflection.
+- [CsvWriter](https://github.com/SourceGeneration/Reflection/tree/main/samples/CsvWriter) is a aotable sample library, it provider only one method to export `.csv` file 
 
-### CsvWriter
-
-[CsvWriter](https://github.com/SourceGeneration/Reflection/tree/main/samples/CsvWriter) is a aotable sample library, it provider only one method to export `.csv` file 
-```C#
-CsvUtility.Write("test.csv", models);
-```
-
-### CustomLibrary
-
-[CustomLibrary](https://github.com/SourceGeneration/Reflection/tree/main/samples/CustomLibrary) example demonstrates how to use SourceReflection to publish your NuGet package and propagate your attributes.
+- [CustomLibrary](https://github.com/SourceGeneration/Reflection/tree/main/samples/CustomLibrary) example demonstrates how to use SourceReflection to publish your NuGet package and propagate your attributes.
