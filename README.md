@@ -46,7 +46,6 @@ public class Goods
 }
 ```
 
-Use SourceReflector
 ```c#
 using SourceGeneration.Reflection;
 
