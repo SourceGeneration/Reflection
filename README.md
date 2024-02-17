@@ -1,6 +1,6 @@
 
 
-# SourceReflection
+# Reflection
 
 [![NuGet](https://img.shields.io/nuget/vpre/SourceGeneration.Reflection.svg)](https://www.nuget.org/packages/SourceGeneration.Reflection)
 
