@@ -81,7 +81,7 @@ Console.WriteLine(goods.Price);
 
 ## I don't want use SourceReflectionAttribute
 
-Uou can reflection without `SourceReflectionAttribute`
+You can reflection without `SourceReflectionAttribute`
 
 Define your class whitout attribute
 
