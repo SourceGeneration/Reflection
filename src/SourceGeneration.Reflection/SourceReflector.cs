@@ -20,27 +20,18 @@ public static class SourceReflector
 #if NET5_0_OR_GREATER
     [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(ReflectionExtensions.DefaultAccessMembers)]
 #endif
-        T> () => GetType(typeof(T));
+        T> (bool allowReflect = false) => GetType(typeof(T), allowReflect);
 
     public static SourceTypeInfo[] GetTypes() => [.. _types.Values];
 
+    // #if NET5_0_OR_GREATER
+    //   [return : NotNullIfNotNull(nameof(allowReflect))]
+    //#endif
     public static SourceTypeInfo? GetType(
 #if NET5_0_OR_GREATER
     [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(ReflectionExtensions.DefaultAccessMembers)]
 #endif
-        Type type)
-    {
-        return _types.TryGetValue(type, out SourceTypeInfo? value) ? value : null;
-    }
-
-// #if NET5_0_OR_GREATER
-//   [return : NotNullIfNotNull(nameof(allowReflect))]
-//#endif
-    public static SourceTypeInfo? GetType(
-#if NET5_0_OR_GREATER
-        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(ReflectionExtensions.DefaultAccessMembers)] 
-#endif
-        Type type, bool allowReflect)
+        Type type, bool allowReflect = false)
     {
         if (_types.TryGetValue(type, out SourceTypeInfo? value))
         {
@@ -49,9 +40,12 @@ public static class SourceReflector
 
         if (allowReflect)
         {
-            return _reflectionTypes.GetOrAdd(type, CreateSourceTypeInfo);
-        }
 
+            if (allowReflect)
+            {
+                return _reflectionTypes.GetOrAdd(type, CreateSourceTypeInfo);
+            }
+        }
         return null;
     }
 
