@@ -47,7 +47,7 @@ internal static class ReflectionExtensions
     private static readonly Type IsExternalInitType = typeof(System.Runtime.CompilerServices.IsExternalInit);
     public static bool IsInitOnly(this PropertyInfo propertyInfo)
     {
-        MethodInfo setMethod = propertyInfo.SetMethod;
+        MethodInfo? setMethod = propertyInfo.SetMethod;
         if (setMethod == null)
             return false;
 
