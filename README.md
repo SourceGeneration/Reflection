@@ -20,10 +20,10 @@ SourceReflection aims to provide a more universal solution, offering `AOTable` R
 ## Installing Reflection
 
 ```powershell
-Install-Package SourceGeneration.Reflection -Version 1.0.0-beta1.240215.1
+Install-Package SourceGeneration.Reflection -Version 1.0.0-beta1.240217.1
 ```
 ```powershell
-dotnet add package SourceGeneration.Reflection --version 1.0.0-beta1.240215.1
+dotnet add package SourceGeneration.Reflection --version 1.0.0-beta1.240217.1
 ```
 
 ## Start
@@ -138,6 +138,8 @@ public class Goods
 
 - [HelloWord](https://github.com/SourceGeneration/Reflection/tree/main/samples/HelloWorld) example demonstrates some basic uses of SourceReflection.
 
-- [CsvWriter](https://github.com/SourceGeneration/Reflection/tree/main/samples/CsvWriter) is a `PublishAOT` sample library, it provider only one method to export `.csv` file 
+- [CsvExporter](https://github.com/SourceGeneration/Reflection/tree/main/samples/CsvWriter) is a `SourceReflection-based` csv file export sample library.
+
+- [AutoMapper](https://github.com/SourceGeneration/Reflection/tree/main/samples/AutoMapper) is a `SourceReflection-based` object-object mapper library.
 
 - [CustomLibrary](https://github.com/SourceGeneration/Reflection/tree/main/samples/CustomLibrary) example demonstrates how to use SourceReflection to publish your NuGet package and propagate your attributes.
