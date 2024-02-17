@@ -138,6 +138,6 @@ public class Goods
 
 - [HelloWord](https://github.com/SourceGeneration/Reflection/tree/main/samples/HelloWorld) example demonstrates some basic uses of SourceReflection.
 
-- [CsvWriter](https://github.com/SourceGeneration/Reflection/tree/main/samples/CsvWriter) is a aotable sample library, it provider only one method to export `.csv` file 
+- [CsvWriter](https://github.com/SourceGeneration/Reflection/tree/main/samples/CsvWriter) is a `PublishAOT` sample library, it provider only one method to export `.csv` file 
 
 - [CustomLibrary](https://github.com/SourceGeneration/Reflection/tree/main/samples/CustomLibrary) example demonstrates how to use SourceReflection to publish your NuGet package and propagate your attributes.
