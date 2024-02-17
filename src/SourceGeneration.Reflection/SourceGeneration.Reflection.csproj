@@ -7,7 +7,7 @@
 		<LangVersion>12</LangVersion>
 		<SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
 
-		<Version>1.0.0-beta1.240215.1</Version>
+		<Version>1.0.0-beta1.240217.1</Version>
 
 		<Authors>SourceGeneration</Authors>
 		<Description>Reflection with source generator</Description>
