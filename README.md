@@ -1,12 +1,12 @@
 
 
-# SourceReflection
+# Reflection
 
 [![NuGet](https://img.shields.io/nuget/vpre/SourceGeneration.Reflection.svg)](https://www.nuget.org/packages/SourceGeneration.Reflection)
 
 ## Why
 
-With the development of .NET, there is an increasing need for AOT Native in many applications. However, reflection and dynamic code pose obstacles to AOT deployment. `Source generators` can effectively this issue. For example, `System.Json.Text` uses a `Source generator` to handle object serialization. However, these implementations are specific to individual businesses and cannot be easily generalized.
+With the development of .NET, there is an increasing need for AOT Native in many applications. However, reflection and dynamic code pose obstacles to AOT deployment. `Source generators` can effectively this issue. For example, `System.Json.Text` use `SourceGenerator` to handle object serialization. However, these implementations are specific to individual businesses and cannot be easily generalized.
 
 SourceReflection aims to provide a more universal solution, offering `AOTable` Reflection support to more developers without the need for repetitive source generator implementation.
 
@@ -46,7 +46,6 @@ public class Goods
 }
 ```
 
-Use SourceReflector
 ```c#
 using SourceGeneration.Reflection;
 
@@ -139,6 +138,6 @@ public class Goods
 
 - [HelloWord](https://github.com/SourceGeneration/Reflection/tree/main/samples/HelloWorld) example demonstrates some basic uses of SourceReflection.
 
-- [CsvWriter](https://github.com/SourceGeneration/Reflection/tree/main/samples/CsvWriter) is a aotable sample library, it provider only one method to export `.csv` file 
+- [CsvWriter](https://github.com/SourceGeneration/Reflection/tree/main/samples/CsvWriter) is a `PublishAOT` sample library, it provider only one method to export `.csv` file 
 
 - [CustomLibrary](https://github.com/SourceGeneration/Reflection/tree/main/samples/CustomLibrary) example demonstrates how to use SourceReflection to publish your NuGet package and propagate your attributes.
