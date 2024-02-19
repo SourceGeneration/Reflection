@@ -161,6 +161,11 @@ namespace System.Runtime.CompilerServices
             cancellationToken.ThrowIfCancellationRequested();
 
             var typeSymbol = queue.Dequeue();
+
+            if (typeSymbol.DeclaredAccessibility == Accessibility.Private ||
+                typeSymbol.DeclaredAccessibility == Accessibility.Protected)
+                continue;
+
             yield return Parse(typeSymbol);
 
             if (typeSymbol.BaseType.ContainingAssembly.Equals(assemblySymbol, SymbolEqualityComparer.Default) && !typeSymbols.Contains(typeSymbol.BaseType))
