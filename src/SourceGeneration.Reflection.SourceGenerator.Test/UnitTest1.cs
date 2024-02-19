@@ -13,13 +13,10 @@ using SourceGeneration.Reflection;
 
 namespace SourceGeneration.Reflection.Sample2
 {
-    [SourceReflection]
     public class D 
     {  
-
-public string A {get; private set;}
-internal void Add(){}
-        public int Add(int x) => x + 1;
+           [SourceReflection]
+           protected class NestedClass { }
     }
 }
 ";
