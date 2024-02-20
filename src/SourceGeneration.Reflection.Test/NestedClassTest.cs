@@ -1,4 +1,6 @@
-﻿namespace SourceGeneration.Reflection.Test;
+﻿using System.Text.Json.Serialization;
+
+namespace SourceGeneration.Reflection.Test;
 
 [TestClass]
 public class NestedClassTest
@@ -29,5 +31,4 @@ public class NestedClassTest
     {
         public int Property { get; set; }
     }
-
 }
