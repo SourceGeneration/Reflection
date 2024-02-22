@@ -16,6 +16,40 @@ public static class SourceReflector
             _types.Add(typeInfo.Type, typeInfo);
     }
 
+    public static T CreateInstance<
+#if NET5_0_OR_GREATER
+[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.NonPublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
+    T>(params object?[] args)
+    {
+        return (T)CreateInstance(typeof(T), args);
+    }
+
+    public static object CreateInstance(
+#if NET5_0_OR_GREATER
+[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.NonPublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
+        Type type,
+        params object?[] args)
+    {
+        var typeInfo = GetRequiredType(type);
+
+        args ??= [];
+
+        var methods = typeInfo.DeclaredConstructors.Where(x => x.Parameters.Count(x => !x.HasDefaultValue) <= args.Length).ToList();
+
+        var method = Type.DefaultBinder.BindToMethod(ReflectionExtensions.DeclaredOnlyLookup, methods.Select(x => x.ConstructorInfo).ToArray(), ref args, null, null, null, out object? state);
+
+        if (typeInfo.IsReflected)
+        {
+            return method.Invoke(null, args)!;
+        }
+        else
+        {
+            return methods.First(x => x.ConstructorInfo == method).Invoke(args);
+        }
+    }
+
     public static SourceTypeInfo GetRequiredType<
 #if NET5_0_OR_GREATER
     [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(ReflectionExtensions.DefaultAccessMembers)]
@@ -37,7 +71,7 @@ public static class SourceReflector
         }
         else
         {
-            return GetRequiredType(type, false) ?? throw new KeyNotFoundException($"No type info found for type '{type}', please ensure that the type '{type}' has the [SourceReflectionAttribute]");
+            return GetType(type, false) ?? throw new KeyNotFoundException($"No type info found for type '{type}', please ensure that the type '{type}' has the [SourceReflectionAttribute]");
         }
     }
 
