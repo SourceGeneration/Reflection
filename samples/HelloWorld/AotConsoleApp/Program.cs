@@ -10,10 +10,10 @@ type.GetProperty("Id")!.SetValue(goods, 1); // private property
 type.GetProperty("Name")!.SetValue(goods, "book"); // private property setter
 type.GetProperty("Price")!.SetValue(goods, 3.14); // public property
 
-// Output book
-Console.WriteLine(goods.Name);
 // Output 1
 Console.WriteLine(type.GetProperty("Id")!.GetValue(goods));
+// Output book
+Console.WriteLine(goods.Name);
 // Output 3.14
 Console.WriteLine(goods.Price);
 
