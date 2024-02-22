@@ -170,13 +170,13 @@ public class CreateInstanceTestObject
 ```
 
 ```c#
-var o1 = SourcReflector.CreateInstance<CreateInstanceTestObject>(); // Call the first constructor.
-var o2 = SourcReflector.CreateInstance<CreateInstanceTestObject>((byte)1); // Call the second constructor.
-var o3 = SourcReflector.CreateInstance<CreateInstanceTestObject>(1, 2); // Call the third constructor.
-var o4 = SourcReflector.CreateInstance<CreateInstanceTestObject>(1L); // Call the fourth constructor.
+var o1 = SourceReflector.CreateInstance<CreateInstanceTestObject>(); // Call the first constructor.
+var o2 = SourceReflector.CreateInstance<CreateInstanceTestObject>((byte)1); // Call the second constructor.
+var o3 = SourceReflector.CreateInstance<CreateInstanceTestObject>(1, 2); // Call the third constructor.
+var o4 = SourceReflector.CreateInstance<CreateInstanceTestObject>(1L); // Call the fourth constructor.
 //or use non-generic method
-var o5 = SourcReflector.CreateInstance(typeof(CreateInstanceTestObject), 1); // Call the fourth constructor.
-var o6 = SourcReflector.CreateInstance(typeof(CreateInstanceTestObject), 1, 2, "abc"); // Call the fourth constructor.
+var o5 = SourceReflector.CreateInstance(typeof(CreateInstanceTestObject), 1); // Call the fourth constructor.
+var o6 = SourceReflector.CreateInstance(typeof(CreateInstanceTestObject), 1, 2, "abc"); // Call the fourth constructor.
 
 ```
 
