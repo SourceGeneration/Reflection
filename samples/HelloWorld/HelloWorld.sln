@@ -5,6 +5,8 @@ VisualStudioVersion = 17.10.34607.79
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AotConsoleApp", "AotConsoleApp\AotConsoleApp.csproj", "{0BA2400E-6C8A-466D-BD5B-6111FACB74A9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreateInstance", "CreateInstance\CreateInstance.csproj", "{9963701E-1ECA-4B8B-B459-21A9FF45265D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{0BA2400E-6C8A-466D-BD5B-6111FACB74A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0BA2400E-6C8A-466D-BD5B-6111FACB74A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0BA2400E-6C8A-466D-BD5B-6111FACB74A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9963701E-1ECA-4B8B-B459-21A9FF45265D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9963701E-1ECA-4B8B-B459-21A9FF45265D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9963701E-1ECA-4B8B-B459-21A9FF45265D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9963701E-1ECA-4B8B-B459-21A9FF45265D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
