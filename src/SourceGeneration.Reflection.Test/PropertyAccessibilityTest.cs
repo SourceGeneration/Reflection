@@ -11,12 +11,12 @@ public class PropertyAccessibilityTest
 
         Assert.AreEqual(6, type.DeclaredFields.Length);
 
-        AssertPropertyInfo(type.DeclaredProperties[0], "PublicField", typeof(int), SourceAccessibility.Public);
-        AssertPropertyInfo(type.DeclaredProperties[1], "PrivateField", typeof(int), SourceAccessibility.Private);
-        AssertPropertyInfo(type.DeclaredProperties[2], "ProtectedField", typeof(int), SourceAccessibility.Protected);
-        AssertPropertyInfo(type.DeclaredProperties[3], "InternalField", typeof(int), SourceAccessibility.Internal);
-        AssertPropertyInfo(type.DeclaredProperties[4], "InternalProtectedField", typeof(int), SourceAccessibility.ProtectedOrInternal);
-        AssertPropertyInfo(type.DeclaredProperties[5], "ProtectedInternalField", typeof(int), SourceAccessibility.ProtectedOrInternal);
+        AssertPropertyInfo(type.DeclaredProperties[0], "Public", typeof(int), SourceAccessibility.Public);
+        AssertPropertyInfo(type.DeclaredProperties[1], "Private", typeof(int), SourceAccessibility.Private);
+        AssertPropertyInfo(type.DeclaredProperties[2], "Protected", typeof(int), SourceAccessibility.Protected);
+        AssertPropertyInfo(type.DeclaredProperties[3], "Internal", typeof(int), SourceAccessibility.Internal);
+        AssertPropertyInfo(type.DeclaredProperties[4], "InternalProtected", typeof(int), SourceAccessibility.ProtectedOrInternal);
+        AssertPropertyInfo(type.DeclaredProperties[5], "ProtectedInternal", typeof(int), SourceAccessibility.ProtectedOrInternal);
     }
 
     [TestMethod]
