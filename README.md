@@ -154,7 +154,7 @@ var type = SourceReflector.GetType(typeof(InitOnlyPropertyTestObject));
 Assert.IsTrue(type.GetProperty("Property").IsInitOnly);
 ```
 
-## CreateInstance
+## Create Instance
 
 The `SourceReflector.CreateInstance` method has almost the same functionality and features as the `System.Activator.CreateInstance` method.
 It supports parameter matching and parameter default values.
@@ -181,7 +181,7 @@ var o6 = SourcReflector.CreateInstance(typeof(CreateInstanceTestObject), 1, 2, "
 
 ```
 
-## Without Attribute
+## Without `SourceReflectionAttribute`
 
 You can also without using `SourceReflectionAttribute` for reflection
 
@@ -198,10 +198,8 @@ public class Goods
     }
 }
 ```
-Use SourceReflector
-```c#
-using SourceGeneration.Reflection;
 
+```c#
 // Get TypeInfo and allow Runtime Reflection
 var type = SourceReflector.GetType(typeof(Goods), true);
 
@@ -214,7 +212,7 @@ type.GetMethod("Discount").Invoke(goods, [0.5]);
 
 It can work properly after AOT compilation. `DynamicallyAccessedMembers` allows tools to understand which members are being accessed during the execution of a program. 
 
-## Use Custom Attribute
+## Use other attribute to mark SourceReflection
 
 You can create a custom attribute to indicate to the source generator which types need to be reflected. 
 
@@ -231,9 +229,11 @@ Edit your project `.csproj`
   <CompilerVisibleProperty Include="DisplaySourceReflectionAttribute" />
 </ItemGroup>
 ```
+
 Now you can use the `DisplayAttribute` to inform the source generator that you need to reflect it.
+
 ```c#
-[System.ComponentModel.DataAnnotations.Display]
+[System.ComponentModel.DataAnnotations.DisplayAttribute]
 public class Goods
 {
     private int Id { get; set; }
