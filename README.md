@@ -288,10 +288,10 @@ You don't need to worry about whether the user has marked an object with the `So
 
 ## Samples
 
-- [HelloWord](https://github.com/SourceGeneration/Reflection/tree/main/samples/HelloWorld) example demonstrates some basic uses of SourceReflection.
+- [Basic](https://github.com/SourceGeneration/Reflection/tree/main/samples/Basic) example demonstrates some basic uses of SourceReflection.
 
-- [CsvExporter](https://github.com/SourceGeneration/Reflection/tree/main/samples/CsvWriter) is a `SourceReflection-based` csv file export sample library.
+- [CsvExporter](https://github.com/SourceGeneration/Reflection/tree/main/samples/CsvWriter) is a csv file export sample library.
 
-- [AutoMapper](https://github.com/SourceGeneration/Reflection/tree/main/samples/AutoMapper) is a `SourceReflection-based` object-object mapper library.
+- [AutoMapper](https://github.com/SourceGeneration/Reflection/tree/main/samples/AutoMapper) is a object-object mapper sample library.
 
 - [CustomLibrary](https://github.com/SourceGeneration/Reflection/tree/main/samples/CustomLibrary) example demonstrates how to use SourceReflection to publish your NuGet package and propagate your attributes.
