@@ -16,32 +16,57 @@ public static class SourceReflector
             _types.Add(typeInfo.Type, typeInfo);
     }
 
+    public static SourceTypeInfo GetRequiredType<
+#if NET5_0_OR_GREATER
+    [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(ReflectionExtensions.DefaultAccessMembers)]
+#endif
+    T>(bool allowRuntimeReflection = false)
+    {
+        return GetRequiredType(typeof(T), allowRuntimeReflection);
+    }
+
+    public static SourceTypeInfo GetRequiredType(
+#if NET5_0_OR_GREATER
+    [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(ReflectionExtensions.DefaultAccessMembers)]
+#endif
+    Type type, bool allowRuntimeReflection = false)
+    {
+        if (allowRuntimeReflection)
+        {
+            return GetType(type, true)!;
+        }
+        else
+        {
+            return GetRequiredType(type, false) ?? throw new KeyNotFoundException($"No type info found for type '{type}', please ensure that the type '{type}' has the [SourceReflectionAttribute]");
+        }
+    }
+
     public static SourceTypeInfo? GetType<
 #if NET5_0_OR_GREATER
     [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(ReflectionExtensions.DefaultAccessMembers)]
 #endif
-        T> (bool allowReflect = false) => GetType(typeof(T), allowReflect);
+    T>(bool allowRuntimeReflection = false) => GetType(typeof(T), allowRuntimeReflection);
 
     public static SourceTypeInfo[] GetTypes() => [.. _types.Values];
 
-//#if NET5_0_OR_GREATER
-//    [return: System.Diagnostics.CodeAnalysis.NotNullIfNotNull(nameof(allowReflect))]
-//#endif
+    //#if NET5_0_OR_GREATER
+    //    [return: System.Diagnostics.CodeAnalysis.NotNullIfNotNull(nameof(allowReflect))]
+    //#endif
     public static SourceTypeInfo? GetType(
 #if NET5_0_OR_GREATER
     [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(ReflectionExtensions.DefaultAccessMembers)]
 #endif
-        Type type, bool allowReflect = false)
+        Type type, bool allowRuntimeReflection = false)
     {
         if (_types.TryGetValue(type, out SourceTypeInfo? value))
         {
             return value;
         }
 
-        if (allowReflect)
+        if (allowRuntimeReflection)
         {
 
-            if (allowReflect)
+            if (allowRuntimeReflection)
             {
                 return _reflectionTypes.GetOrAdd(type, CreateSourceTypeInfo);
             }
