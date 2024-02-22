@@ -75,15 +75,21 @@ public class CSharpCodeBuilder
 
     public void AppendAssignment(string property, object value, bool statement = false)
     {
-        string valueStr;
-        if (value == null) valueStr = "null";
-        else if (value is bool b) valueStr = b ? "true" : "false";
-        else if (value is string s) valueStr = @$"""{s}""";
-        else valueStr = value.ToString();
+        string literal = GetConstantLiteral(value);
 
         char end = statement ? ';' : ',';
-        AppendLine($"{property} = {valueStr}{end}");
+        AppendLine($"{property} = {literal}{end}");
     }
 
     public override string ToString() => _builder.ToString();
+
+    public static string GetConstantLiteral(object value)
+    {
+        if (value == null) return "null";
+        else if (value is bool b) return b ? "true" : "false";
+        else if (value is string s) return @$"""{s}""";
+        else if (value is float f) return f.ToString("G9");
+        else if (value is double d) return d.ToString("G17");
+        else return value.ToString();
+    }
 }

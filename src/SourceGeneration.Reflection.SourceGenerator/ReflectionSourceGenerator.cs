@@ -79,21 +79,24 @@ public partial class ReflectionSourceGenerator : IIncrementalGenerator
         var results = context.SyntaxProvider.CreateSyntaxProvider(
             static (node, _) =>
             {
-                if (node is not TypeDeclarationSyntax type)
+                if (node is not BaseTypeDeclarationSyntax baseType)
                     return false;
 
                 if (SourceReflectionTypes.Length > 0)
                 {
-                    var typeName = type.Identifier.ToFullString().Trim();
+                    var typeName = baseType.Identifier.ToFullString().Trim();
 
                     if (SourceReflectionTypes.Any(x => MatchFullName(x, typeName)))
                         return true;
                 }
 
-                if (type.TypeParameterList != null || type.TypeParameterList?.Parameters.Count > 0)
-                    return false;
+                if (baseType is TypeDeclarationSyntax type)
+                {
+                    if (type.TypeParameterList != null || type.TypeParameterList?.Parameters.Count > 0)
+                        return false;
+                }
 
-                return type.AttributeLists.Any(x => x.Attributes.Any(x =>
+                return baseType.AttributeLists.Any(x => x.Attributes.Any(x =>
                 {
                     var name = x.Name.ToFullString().Trim();
                     if (!name.EndsWith("Attribute"))
@@ -166,7 +169,14 @@ namespace System.Runtime.CompilerServices
                 typeSymbol.DeclaredAccessibility == Accessibility.Protected)
                 continue;
 
-            yield return Parse(typeSymbol);
+            if (typeSymbol.TypeKind == TypeKind.Enum)
+            {
+                yield return PaseEnum(typeSymbol);
+            }
+            else
+            {
+                yield return ParseType(typeSymbol);
+            }
 
             if (typeSymbol.BaseType.ContainingAssembly.Equals(assemblySymbol, SymbolEqualityComparer.Default) && !typeSymbols.Contains(typeSymbol.BaseType))
             {
@@ -175,7 +185,27 @@ namespace System.Runtime.CompilerServices
         }
     }
 
-    private static SourceTypeInfo Parse(INamedTypeSymbol typeSymbol)
+    private static SourceTypeInfo PaseEnum(INamedTypeSymbol typeSymbol)
+    {
+        SourceTypeInfo typeInfo = new()
+        {
+            Name = typeSymbol.Name,
+            BaseType = typeSymbol.BaseType.ToDisplayString(GlobalTypeDisplayFormat),
+            EnumUnderlyingType = typeSymbol.EnumUnderlyingType.ToDisplayString(GlobalTypeDisplayFormat),
+            FullName = typeSymbol.ToDisplayString(GlobalTypeDisplayFormat),
+            IsEnum = true,
+            Accessibility = typeSymbol.DeclaredAccessibility,
+        };
+
+        foreach (var field in typeSymbol.GetMembers().OfType<IFieldSymbol>())
+        {
+            typeInfo.Fields.Add(CreateField(field));
+        }
+
+        return typeInfo;
+    }
+
+    private static SourceTypeInfo ParseType(INamedTypeSymbol typeSymbol)
     {
         string fullname;
         bool isGenericTypeDefinition;
@@ -190,7 +220,6 @@ namespace System.Runtime.CompilerServices
             fullname = typeSymbol.ToDisplayString(GlobalTypeDisplayFormat);
         }
 
-        var name = typeSymbol.ContainingAssembly.Identity.GetDisplayName(true);
         SourceTypeInfo typeInfo = new()
         {
             Name = typeSymbol.Name,
@@ -209,20 +238,7 @@ namespace System.Runtime.CompilerServices
 
         foreach (var field in typeSymbol.GetMembers().OfType<IFieldSymbol>())
         {
-            SourceFieldInfo fieldInfo = new()
-            {
-                Name = field.Name,
-                Accessibility = field.DeclaredAccessibility,
-                NullableAnnotation = field.NullableAnnotation,
-                IsRequired = field.IsRequired,
-                IsConst = field.IsConst,
-                ConstantValue = field.ConstantValue,
-                IsStatic = field.IsStatic,
-                IsReadOnly = field.IsReadOnly,
-                FieldType = field.Type.ToDisplayString(GlobalTypeDisplayFormat),
-            };
-
-            typeInfo.Fields.Add(fieldInfo);
+            typeInfo.Fields.Add(CreateField(field));
         }
 
         foreach (var property in typeSymbol.GetMembers().OfType<IPropertySymbol>())
@@ -284,6 +300,7 @@ namespace System.Runtime.CompilerServices
                 {
                     Name = x.Name,
                     ParameterType = x.Type.ToDisplayString(GlobalTypeDisplayFormat),
+                    NullableAnnotation = x.NullableAnnotation,
                     HasDefaultValue = x.HasExplicitDefaultValue,
                     DefaultValue = x.HasExplicitDefaultValue ? x.ExplicitDefaultValue : null,
                 }).ToList(),
@@ -293,6 +310,22 @@ namespace System.Runtime.CompilerServices
         }
 
         return typeInfo;
+    }
+
+    private static SourceFieldInfo CreateField(IFieldSymbol field)
+    {
+        return new()
+        {
+            Name = field.Name,
+            Accessibility = field.DeclaredAccessibility,
+            NullableAnnotation = field.NullableAnnotation,
+            IsRequired = field.IsRequired,
+            IsConst = field.IsConst,
+            ConstantValue = field.ConstantValue,
+            IsStatic = field.IsStatic,
+            IsReadOnly = field.IsReadOnly,
+            FieldType = field.Type.ToDisplayString(GlobalTypeDisplayFormat),
+        };
     }
 
     private static string Emit(List<SourceTypeInfo> types, CancellationToken cancellationToken)
@@ -315,10 +348,15 @@ namespace System.Runtime.CompilerServices
                         builder.AppendAssignment("IsStatic", type.IsStatic);
                         builder.AppendAssignment("IsRecord", type.IsRecord);
                         builder.AppendAssignment("IsStruct", type.IsStruct);
+                        builder.AppendAssignment("IsEnum", type.IsEnum);
                         builder.AppendAssignment("IsReadOnly", type.IsReadOnly);
 
                         builder.AppendLine($"Type = typeof({type.FullName}),");
                         builder.AppendLine($"BaseType = typeof({type.BaseType}),");
+                        if (type.EnumUnderlyingType != null)
+                        {
+                            builder.AppendLine($"EnumUnderlyingType = typeof({type.EnumUnderlyingType}),");
+                        }
                         builder.AppendLine($"Accessibility = global::SourceGeneration.Reflection.SourceAccessibility.{type.Accessibility},");
 
                         if (type.Fields.Count > 0)
@@ -350,7 +388,14 @@ namespace System.Runtime.CompilerServices
                                             !type.IsRefLikeType &&
                                             field.Accessibility != Accessibility.Private && field.Accessibility != Accessibility.Protected)
                                         {
-                                            builder.AppendLine($@"GetValue = instance => (({type.FullName})instance).{field.Name},");
+                                            if (field.IsConst)
+                                            {
+                                                builder.AppendLine($@"GetValue = _ => {CSharpCodeBuilder.GetConstantLiteral(field.ConstantValue)},");
+                                            }
+                                            else
+                                            {
+                                                builder.AppendLine($@"GetValue = instance => (({type.FullName})instance).{field.Name},");
+                                            }
 
                                             if (!type.IsStruct && !field.IsReadOnly && !field.IsConst)
                                             {
@@ -454,7 +499,7 @@ namespace System.Runtime.CompilerServices
                                             builder.AppendIndent();
                                             builder.Append("Invoke = (instance, parameters) => ");
 
-                                            if(method.ReturnType == "void")
+                                            if (method.ReturnType == "void")
                                             {
                                                 builder.Append("{ ");
                                             }

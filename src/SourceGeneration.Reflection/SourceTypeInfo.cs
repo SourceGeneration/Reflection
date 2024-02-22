@@ -16,7 +16,10 @@ public class SourceTypeInfo : SourceMemberInfo
 #endif
     public Type? BaseType { get; init; }
 
+    public Type? EnumUnderlyingType { get; init; }
+
     public bool IsRecord { get; init; }
+    public bool IsEnum { get; init; }
     public bool IsStatic { get; init; }
     public bool IsStruct { get; init; }
     public bool IsReadOnly { get; init; }

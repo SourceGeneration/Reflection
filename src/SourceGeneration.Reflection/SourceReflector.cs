@@ -24,9 +24,9 @@ public static class SourceReflector
 
     public static SourceTypeInfo[] GetTypes() => [.. _types.Values];
 
-    // #if NET5_0_OR_GREATER
-    //   [return : NotNullIfNotNull(nameof(allowReflect))]
-    //#endif
+//#if NET5_0_OR_GREATER
+//    [return: System.Diagnostics.CodeAnalysis.NotNullIfNotNull(nameof(allowReflect))]
+//#endif
     public static SourceTypeInfo? GetType(
 #if NET5_0_OR_GREATER
     [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(ReflectionExtensions.DefaultAccessMembers)]
@@ -55,7 +55,8 @@ public static class SourceReflector
 #endif
         Type type)
     {
-        var isStruct = type.IsValueType && !type.IsPrimitive && !type.IsEnum;
+        var isEnum = type.IsEnum;
+        var isStruct = type.IsValueType && !type.IsPrimitive && !isEnum;
         return new SourceTypeInfo
         {
             Type = type,
@@ -63,6 +64,8 @@ public static class SourceReflector
             BaseType = type.BaseType,
             Name = type.Name,
             IsStruct = isStruct,
+            IsEnum = isEnum,
+            EnumUnderlyingType = isEnum ? type.GetEnumUnderlyingType() : null,
 #if NET5_0_OR_GREATER
             IsReadOnly = isStruct && type.GetCustomAttribute<System.Runtime.CompilerServices.IsReadOnlyAttribute>() != null,
 #endif

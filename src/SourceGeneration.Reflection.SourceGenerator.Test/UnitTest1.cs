@@ -13,10 +13,10 @@ using SourceGeneration.Reflection;
 
 namespace SourceGeneration.Reflection.Sample2
 {
-    public class D 
-    {  
-           [SourceReflection]
-           protected class NestedClass { }
+    [SourceReflection]
+    public enum EnumTestObject
+    {
+        A,B,
     }
 }
 ";

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace SourceGeneration.Reflection;
 
@@ -42,7 +41,6 @@ internal static class ReflectionExtensions
     {
         return property.CanRead ? property.GetMethod!.GetAccessibility() : property.SetMethod!.GetAccessibility();
     }
-
 
     private static readonly Type IsExternalInitType = typeof(System.Runtime.CompilerServices.IsExternalInit);
     public static bool IsInitOnly(this PropertyInfo propertyInfo)

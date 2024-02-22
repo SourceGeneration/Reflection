@@ -3,7 +3,7 @@ using System.Diagnostics;
 namespace SourceGeneration.Reflection.Test;
 
 [TestClass]
-public class FieldReflectionTest
+public class FieldAccessibilityTest
 {
     [TestMethod]
     public void Accessibility()
