@@ -80,16 +80,15 @@ type.GetMethod("Discount").Invoke(goods, [0.5]);
 Console.WriteLine(goods.Price);
 ```
 
-
 ## Enum
 ```c#
+[SourceReflection]
 public enum TestEnum { A, B }
 ```
 
 ```c#
 var type = SourceReflector.GetType(typeof(TestEnum));
-
-Assert.AreEqual(2, type.DeclaredFields.Length);
+Assert.IsTrue(type.IsEnum);
 Assert.AreEqual("A", type.DeclaredFields[0].Name);
 Assert.AreEqual("B", type.DeclaredFields[1].Name);
 Assert.AreEqual(0, type.DeclaredFields[0].GetValue(null));
