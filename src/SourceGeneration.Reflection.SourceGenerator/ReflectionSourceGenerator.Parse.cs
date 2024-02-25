@@ -40,8 +40,8 @@ public partial class ReflectionSourceGenerator
             {
                 yield return ParseType(typeSymbol);
             }
-
-            if (typeSymbol.BaseType != null && typeSymbol.BaseType.ContainingAssembly.Equals(assemblySymbol, SymbolEqualityComparer.Default) && !typeSymbols.Contains(typeSymbol.BaseType))
+            
+            if (typeSymbol.BaseType != null && typeSymbol.BaseType.ContainingAssembly.Equals(assemblySymbol, SymbolEqualityComparer.Default) && !typeSymbols.Contains(typeSymbol.BaseType, SymbolEqualityComparer.Default))
             {
                 queue.Enqueue(typeSymbol.BaseType);
             }
