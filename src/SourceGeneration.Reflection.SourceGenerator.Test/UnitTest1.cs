@@ -15,16 +15,14 @@ using SourceGeneration.Reflection;
 
 namespace SourceGeneration.Reflection.Sample2
 {
-
-[SourceReflection]
-public class A
-{
-    //public T Get<T>(T a, T[] value,Action<T,Func<T,Task<T>>> action) => value[0];
-    //public T Get<T>(T a) => a;
-}
-    public enum EnumTestObject
+    [SourceReflection]
+    public class IndexTestObject
     {
-        A,B,
+        public string this[int a]
+        {
+            get => string.Empty;
+            set { }
+        }
     }
 }
 ";
