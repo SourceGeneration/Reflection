@@ -1,8 +1,11 @@
 ﻿using SourceGeneration.Reflection;
 
 [assembly: SourceReflectionType<object>]
-[assembly: SourceReflectionType<Array>]
+[assembly: SourceReflectionType<int>]
+[assembly: SourceReflectionType<string>]
 [assembly: SourceReflectionType(typeof(Enumerable))]
 [assembly: SourceReflectionType(typeof(List<>))]
-
-namespace SourceGeneration.Reflection.Test;
+[assembly: SourceReflectionType<Array>]
+[assembly: SourceReflectionType<Task>]
+[assembly: SourceReflectionType<FileStream>]
+[assembly: SourceReflectionType<ValueTask>]
