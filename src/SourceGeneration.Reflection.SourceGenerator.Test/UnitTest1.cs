@@ -8,22 +8,22 @@ namespace SourceGeneration.Reflection.SourceGenerator.Test
         {
             string source = @"
 //[assembly: SourceReflectionAttribute<SourceGeneration.Reflection.Sample2.EnumTestObject>]
-[assembly: SourceReflectionType(typeof(object))]
+[assembly: SourceReflectionType(typeof(System.Collections.Generic.List<>))]
 using System;
 using System.Threading.Tasks;
 using SourceGeneration.Reflection;
 
 namespace SourceGeneration.Reflection.Sample2
 {
-    [SourceReflection]
-    public class IndexTestObject
-    {
-        public string this[int a]
-        {
-            get => string.Empty;
-            set { }
-        }
-    }
+    //[SourceReflection]
+    //public class IndexTestObject
+    //{
+    //    public string this[int a]
+    //    {
+    //        get => string.Empty;
+    //        set { }
+    //    }
+    //}
 }
 ";
             var result = CSharpTestGenerator.Generate<ReflectionSourceGenerator>(source, typeof(SourceReflectionAttribute).Assembly);
