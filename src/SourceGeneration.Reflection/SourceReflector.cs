@@ -22,7 +22,7 @@ public static class SourceReflector
 #endif
     T>(params object?[] args)
     {
-        return (T)CreateInstance(typeof(T), args);
+        return (T)CreateInstance(GetRequiredType<T>(), args);
     }
 
     public static object CreateInstance(
@@ -32,8 +32,16 @@ public static class SourceReflector
         Type type,
         params object?[] args)
     {
-        var typeInfo = GetRequiredType(type);
+        return CreateInstance(GetRequiredType(type), args);
+    }
 
+    public static object CreateInstance(
+#if NET5_0_OR_GREATER
+[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.NonPublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
+        SourceTypeInfo typeInfo,
+        params object?[] args)
+    {
         args ??= [];
 
         var methods = typeInfo.DeclaredConstructors.Where(x => x.Parameters.Count(x => !x.HasDefaultValue) <= args.Length).ToList();
@@ -49,6 +57,7 @@ public static class SourceReflector
             return methods.First(x => x.ConstructorInfo == method).Invoke(args);
         }
     }
+
 
     public static SourceTypeInfo GetRequiredType<
 #if NET5_0_OR_GREATER
@@ -157,19 +166,25 @@ public static class SourceReflector
                 IsRequired = x.GetCustomAttribute<System.Runtime.CompilerServices.RequiredMemberAttribute>() != null,
                 NullableAnnotation = x.GetCustomAttribute<System.Runtime.CompilerServices.NullableAttribute>() == null ? SourceNullableAnnotation.None : SourceNullableAnnotation.Annotated,
             }).ToArray(),
-            DeclaredProperties = type.GetProperties(ReflectionExtensions.DeclaredOnlyLookup).Select(x => new SourcePropertyInfo(() => x)
+            DeclaredProperties = type.GetProperties(ReflectionExtensions.DeclaredOnlyLookup).Select(x =>
             {
-                Name = x.Name,
-                Accessibility = x.GetAccessibility(),
-                PropertyType = x.PropertyType,
-                IsStatic = x.GetMethod?.IsStatic == true || x.SetMethod?.IsStatic == true,
-                CanRead = x.CanRead,
-                CanWrite = x.CanRead,
-                IsRequired = x.GetCustomAttribute<System.Runtime.CompilerServices.RequiredMemberAttribute>() != null,
-                IsAbstract = x.CanRead ? x.GetMethod!.IsAbstract : x.SetMethod!.IsAbstract,
-                IsVirtual = x.CanRead ? x.GetMethod!.IsVirtual : x.SetMethod!.IsVirtual,
-                IsInitOnly = x.IsInitOnly(),
-                NullableAnnotation = x.PropertyType.GetCustomAttribute<System.Runtime.CompilerServices.NullableAttribute>() == null ? SourceNullableAnnotation.None : SourceNullableAnnotation.Annotated,
+                var parameters = x.GetIndexParameters();
+                return new SourcePropertyInfo(() => x)
+                {
+                    Name = x.Name,
+                    Accessibility = x.GetAccessibility(),
+                    PropertyType = x.PropertyType,
+                    IsStatic = x.GetMethod?.IsStatic == true || x.SetMethod?.IsStatic == true,
+                    CanRead = x.CanRead,
+                    CanWrite = x.CanRead,
+                    IsRequired = x.GetCustomAttribute<System.Runtime.CompilerServices.RequiredMemberAttribute>() != null,
+                    IsAbstract = x.CanRead ? x.GetMethod!.IsAbstract : x.SetMethod!.IsAbstract,
+                    IsVirtual = x.CanRead ? x.GetMethod!.IsVirtual : x.SetMethod!.IsVirtual,
+                    IsIndexer = parameters != null && parameters.Length > 0,
+                    IndexerParameters = parameters == null ? [] : CreateParameterInfos(parameters),
+                    IsInitOnly = x.IsInitOnly(),
+                    NullableAnnotation = x.PropertyType.GetCustomAttribute<System.Runtime.CompilerServices.NullableAttribute>() == null ? SourceNullableAnnotation.None : SourceNullableAnnotation.Annotated,
+                };
             }).ToArray(),
         };
     }
