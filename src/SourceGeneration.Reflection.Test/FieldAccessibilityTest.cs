@@ -50,7 +50,9 @@ public class FieldAccessibilityTest
 public class TestFieldAccessibilityClass
 {
     public int PublicField = 1;
+#pragma warning disable IDE0044
     private int PrivateField = 1;
+#pragma warning restore IDE0044
     protected int ProtectedField = 1;
     internal int InternalField = 1;
     internal protected int InternalProtectedField = 1;
