@@ -40,7 +40,7 @@ public partial class ReflectionSourceGenerator
             {
                 yield return ParseType(typeSymbol);
             }
-            
+
             if (typeSymbol.BaseType != null && typeSymbol.BaseType.ContainingAssembly.Equals(assemblySymbol, SymbolEqualityComparer.Default) && !typeSymbols.Contains(typeSymbol.BaseType, SymbolEqualityComparer.Default))
             {
                 queue.Enqueue(typeSymbol.BaseType);
@@ -150,6 +150,8 @@ public partial class ReflectionSourceGenerator
                 {
                     Name = x.Name,
                     ParameterType = x.Type.ToDisplayString(GlobalTypeDisplayFormat),
+                    IsParameterTypeRefLike = x.Type.IsRefLikeType,
+                    IsParameterTypePointer = x.Type.Kind == SymbolKind.PointerType,
                     NullableAnnotation = x.NullableAnnotation,
                     HasDefaultValue = x.HasExplicitDefaultValue,
                     HasNestedTypeParameter = x.Type.TypeKind == TypeKind.TypeParameter,
@@ -178,16 +180,21 @@ public partial class ReflectionSourceGenerator
                 {
                     Name = x.Name,
                     HasUnmanagedTypeConstraint = x.HasUnmanagedTypeConstraint,
+                    HasTypeParameterInConstraintTypes = x.ConstraintTypes.Any(x => x.HasTypeParameter()),
                     ConstraintTypes = x.ConstraintTypes.Select(x => x.ToDisplayString(GlobalTypeDisplayFormat)).ToArray(),
                 }).ToArray(),
                 Parameters = method.Parameters.Select(x => new SourceParameterInfo
                 {
                     Name = x.Name,
                     ParameterType = x.Type.ToDisplayString(GlobalTypeDisplayFormat),
+                    IsParameterTypeRefLike = x.Type.IsRefLikeType,
+                    IsParameterTypePointer = x.Type.Kind == SymbolKind.PointerType,
                     NullableAnnotation = x.NullableAnnotation,
                     HasDefaultValue = x.HasExplicitDefaultValue,
                     IsTypeParameter = x.Type.Kind == SymbolKind.TypeParameter,
                     HasNestedTypeParameter = x.Type.HasTypeParameter(),
+                    IsRef =  x.RefKind == RefKind.Ref,
+                    IsOut = x.RefKind == RefKind.Out,
                     DefaultValue = x.HasExplicitDefaultValue ? x.ExplicitDefaultValue : null,
                     DisplayType = x.Type.ToReflectionDisplayString()
                 }).ToList(),

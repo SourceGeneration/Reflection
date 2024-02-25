@@ -11,6 +11,10 @@ internal class SourceParameterInfo
     public bool IsTypeParameter;
     public bool HasNestedTypeParameter;
     public NullableAnnotation NullableAnnotation;
+    public bool IsRef;
+    public bool IsOut;
 
+    public bool IsParameterTypeRefLike;
+    public bool IsParameterTypePointer;
     public string DisplayType;
 }

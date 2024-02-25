@@ -19,9 +19,12 @@ internal class SourceMethodInfo : SourceMethodBase
         if (Accessibility == Accessibility.Private || Accessibility == Accessibility.Protected)
             return false;
 
+        if (Parameters.Any(x => x.IsRef || x.IsOut || x.IsParameterTypeRefLike || x.IsParameterTypePointer))
+            return false;
+
         if (IsGenericMethod)
         {
-            if (TypeParameters.Any(x => x.HasUnmanagedTypeConstraint || x.ConstraintTypes.Length > 1))
+            if (TypeParameters.Any(x => x.HasUnmanagedTypeConstraint || x.HasTypeParameterInConstraintTypes || x.ConstraintTypes.Length > 1))
                 return false;
 
             if (Parameters.Any(x => !x.IsTypeParameter && x.HasNestedTypeParameter))

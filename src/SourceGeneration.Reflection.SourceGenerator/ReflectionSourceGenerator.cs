@@ -89,11 +89,21 @@ public partial class ReflectionSourceGenerator : IIncrementalGenerator
                     if (attribute.Name is GenericNameSyntax genericName)
                     {
                         var type = compilation.GetSemanticModel(attribute.SyntaxTree).GetTypeInfo(genericName.TypeArgumentList.Arguments[0], cancellationToken);
-                        if (type.ConvertedType is INamedTypeSymbol namedTypeSymbol &&
-                            !namedTypeSymbol.IsUnboundGenericType &&
-                            namedTypeSymbol.TypeKind != TypeKind.Error)
+                        if (type.ConvertedType is INamedTypeSymbol namedTypeSymbol)
                         {
-                            namedTypeSymbols.Add(namedTypeSymbol);
+                            if (!namedTypeSymbol.IsUnboundGenericType && namedTypeSymbol.TypeKind != TypeKind.Error)
+                            {
+                                namedTypeSymbols.Add(namedTypeSymbol);
+                            }
+                        }
+                        else if(type.ConvertedType is IArrayTypeSymbol arrayTypeSymbol)
+                        {
+                            if (arrayTypeSymbol.ElementType is INamedTypeSymbol elementType &&
+                                !elementType.IsUnboundGenericType &&
+                                elementType.TypeKind != TypeKind.Error)
+                            {
+                                namedTypeSymbols.Add(elementType);
+                            }
                         }
                     }
                     else if (attribute.ArgumentList != null && attribute.ArgumentList.Arguments.Count == 1)
