@@ -11,14 +11,11 @@ public class GenericTypeTest
     public void SourceReflection()
     {
         var type = SourceReflector.GetRequiredType<List<string>>();
-        var method = type.GetMethod("Add");
-        var property = type.GetProperty("Count");
 
         List<string> list = ["a", "b"];
-
-        method.Invoke(list, ["c"]);
-
-        Assert.AreEqual(3, property.GetValue(list));
+        
+        type.GetMethod("Add")!.Invoke(list, ["c"]);
+        Assert.AreEqual(3, type.GetProperty("Count")!.GetValue(list));
     }
 
     //[TestMethod]
