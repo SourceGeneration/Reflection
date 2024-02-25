@@ -89,19 +89,24 @@ public partial class ReflectionSourceGenerator : IIncrementalGenerator
                     if (attribute.Name is GenericNameSyntax genericName)
                     {
                         var type = compilation.GetSemanticModel(attribute.SyntaxTree).GetTypeInfo(genericName.TypeArgumentList.Arguments[0], cancellationToken);
-                        if (type.ConvertedType is INamedTypeSymbol namedTypeSymbol && namedTypeSymbol.TypeKind != TypeKind.Error)
+                        if (type.ConvertedType is INamedTypeSymbol namedTypeSymbol &&
+                            !namedTypeSymbol.IsUnboundGenericType &&
+                            namedTypeSymbol.TypeKind != TypeKind.Error)
                         {
                             namedTypeSymbols.Add(namedTypeSymbol);
                         }
                     }
                     else if (attribute.ArgumentList != null && attribute.ArgumentList.Arguments.Count == 1)
                     {
-                        if(attribute.ArgumentList.Arguments[0].Expression is TypeOfExpressionSyntax typeOfExpression)
+                        if (attribute.ArgumentList.Arguments[0].Expression is TypeOfExpressionSyntax typeOfExpression)
                         {
                             var type = compilation.GetSemanticModel(attribute.SyntaxTree).GetTypeInfo(typeOfExpression.Type, cancellationToken);
-                            if (type.ConvertedType is INamedTypeSymbol namedTypeSymbol && namedTypeSymbol.TypeKind != TypeKind.Error)
+                            if (type.ConvertedType is INamedTypeSymbol namedTypeSymbol &&
+                                !namedTypeSymbol.IsUnboundGenericType &&
+                                namedTypeSymbol.TypeKind != TypeKind.Error)
                             {
-                                namedTypeSymbols.Add(namedTypeSymbol);
+                                if (!namedTypeSymbol.IsUnboundGenericType)
+                                    namedTypeSymbols.Add(namedTypeSymbol);
                             }
                         }
                     }
@@ -109,6 +114,7 @@ public partial class ReflectionSourceGenerator : IIncrementalGenerator
                     {
                         var type = (INamedTypeSymbol)compilation.GetSemanticModel(attribute.SyntaxTree).GetDeclaredSymbol(attribute.Parent.Parent, cancellationToken);
                         if (type is INamedTypeSymbol namedTypeSymbol &&
+                            !namedTypeSymbol.IsUnboundGenericType &&
                             (namedTypeSymbol.TypeKind == TypeKind.Class ||
                             namedTypeSymbol.TypeKind == TypeKind.Struct ||
                             namedTypeSymbol.TypeKind == TypeKind.Enum))
