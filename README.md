@@ -422,17 +422,15 @@ public class SourcePropertyInfo
 }
 ```
 `SourceReflection` uses lazy evaluation, which means that reflection is only performed and the result is cached when you first retrieve it.
-
 You don't need to worry about whether the user has marked an object with the `SourceReflectionAttribute`. You can use the `SourceReflection` to retrieve metadata or invoke methods in a generic way regardless of whether the attribute is used.
-
 `SourceReflection` globally caching all objects (Type, FieldInfo, PropertyInfo, MethodInfo, ConstructorInfo) in a static cache.
 
 ## Samples
 
 - [Basic](https://github.com/SourceGeneration/Reflection/tree/main/samples/Basic) example demonstrates some basic uses of SourceReflection.
 
-- [CsvExporter](https://github.com/SourceGeneration/Reflection/tree/main/samples/CsvWriter) is a csv file export sample library.
+- [CsvExporter](https://github.com/SourceGeneration/Reflection/tree/main/samples/CsvWriter) is a csv file export sample.
 
-- [AutoMapper](https://github.com/SourceGeneration/Reflection/tree/main/samples/AutoMapper) is a object-object mapper sample library.
+- [AutoMapper](https://github.com/SourceGeneration/Reflection/tree/main/samples/AutoMapper) is a object-object mapper sample.
 
 - [CustomLibrary](https://github.com/SourceGeneration/Reflection/tree/main/samples/CustomLibrary) example demonstrates how to use SourceReflection to publish your NuGet package and propagate your attributes.
