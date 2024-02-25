@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace SourceGeneration.Reflection;
+﻿namespace SourceGeneration.Reflection;
 
 public class SourceParameterInfo
 {
@@ -14,6 +12,8 @@ public class SourceParameterInfo
     public object? DefaultValue { get; init; } = default!;
     public SourceNullableAnnotation NullableAnnotation { get; init; }
 
+    public bool IsRef { get; init; }
+    public bool IsOut { get; init; }
     //private Func<ParameterInfo>? _parameterInfoAccess;
     //public ParameterInfo ParameterInfo
     //{
