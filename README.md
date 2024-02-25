@@ -17,6 +17,7 @@ SourceReflection aims to provide a more universal solution, offering `AOTable` R
 - Record
 - Struct (ref struct is not supports)
 - Enum
+- Array
 - GenericType(just handle known types)
 
 **Supports the the following members**
@@ -38,10 +39,10 @@ SourceReflection aims to provide a more universal solution, offering `AOTable` R
 ## Installing Reflection
 
 ```powershell
-Install-Package SourceGeneration.Reflection -Version 1.0.0-beta2.240225.2
+Install-Package SourceGeneration.Reflection -Version 1.0.0-beta2.240225.3
 ```
 ```powershell
-dotnet add package SourceGeneration.Reflection --version 1.0.0-beta2.240225.2
+dotnet add package SourceGeneration.Reflection --version 1.0.0-beta2.240225.3
 ```
 
 ## Source Reflection
@@ -119,6 +120,30 @@ Assert.AreEqual("B", type.DeclaredFields[1].Name);
 Assert.AreEqual(0, type.DeclaredFields[0].GetValue(null));
 Assert.AreEqual(1, type.DeclaredFields[1].GetValue(null));
 ```
+
+## Array
+
+The usage of `MarkArrayType` is similar to that of Runtime reflection.
+
+```c#
+[assembly: SourceReflectionType(typeof(int))]
+
+SourceTypeInfo type = SourceReflector.GetType<int>();
+SourceTypeInfo arrayType = type.MarkArrayType();
+
+int[] array = [1, 2];
+Assert.AreEqual(2, arrayType.GetRequriedProperty("Length").GetValue(array));
+
+arrayType.GetMethod("Set")!.Invoke(array, [0, 2]);
+Assert.AreEqual(2, arrayType.GetMethod("Get")!.Invoke(array, [0]));
+```
+
+Or adding `SourceReflectionTypeAttribute`
+
+```c#
+[assembly: SourceReflectionType(typeof(int[]))]
+```
+
 
 ## Nullable Annotation
 
