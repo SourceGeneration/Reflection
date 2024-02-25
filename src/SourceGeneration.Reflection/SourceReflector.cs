@@ -106,15 +106,6 @@ public static class SourceReflector
             return value;
         }
 
-        if (type.IsArray)
-        {
-            var elementType = type.GetElementType()!;
-            if (_types.TryGetValue(elementType, out SourceTypeInfo? elementTypeInfo))
-            {
-                return elementTypeInfo.MarkArrayType();
-            }
-        }
-
         if (allowRuntimeReflection)
         {
             if (allowRuntimeReflection)
