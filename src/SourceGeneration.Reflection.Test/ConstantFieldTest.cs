@@ -6,28 +6,28 @@ public class ConstantFieldTest
     [TestMethod]
     public void Test()
     {
-        var type = SourceReflector.GetType<ConstantFieldTestObject>();
-        var field = type.GetField(nameof(ConstantFieldTestObject.NullConst));
+        var type = SourceReflector.GetRequiredType<ConstantFieldTestObject>();
+        var field = type.GetRequriedField(nameof(ConstantFieldTestObject.NullConst));
         Assert.IsTrue(field.IsConst);
         Assert.AreEqual(null, field.GetValue(null));
 
-        field = type.GetField(nameof(ConstantFieldTestObject.StringConst));
+        field = type.GetRequriedField(nameof(ConstantFieldTestObject.StringConst));
         Assert.IsTrue(field.IsConst);
         Assert.AreEqual("a", field.GetValue(null));
 
-        field = type.GetField(nameof(ConstantFieldTestObject.IntegerConst));
+        field = type.GetRequriedField(nameof(ConstantFieldTestObject.IntegerConst));
         Assert.IsTrue(field.IsConst);
         Assert.AreEqual(1, field.GetValue(null));
 
-        field = type.GetField(nameof(ConstantFieldTestObject.BoolConst));
+        field = type.GetRequriedField(nameof(ConstantFieldTestObject.BoolConst));
         Assert.IsTrue(field.IsConst);
         Assert.AreEqual(true, field.GetValue(null));
 
-        field = type.GetField(nameof(ConstantFieldTestObject.FloatConst));
+        field = type.GetRequriedField(nameof(ConstantFieldTestObject.FloatConst));
         Assert.IsTrue(field.IsConst);
         Assert.AreEqual(-double.E, field.GetValue(null));
 
-        field = type.GetField(nameof(ConstantFieldTestObject.EnumConst));
+        field = type.GetRequriedField(nameof(ConstantFieldTestObject.EnumConst));
         Assert.IsTrue(field.IsConst);
         Assert.AreEqual(1, field.GetValue(null));
     }
