@@ -2,7 +2,7 @@
 
 namespace SourceGeneration.Reflection;
 
-internal static class ReflectionExtensions
+public static class ReflectionExtensions
 {
     public const BindingFlags DeclaredOnlyLookup = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
 
@@ -19,7 +19,7 @@ internal static class ReflectionExtensions
         System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.NonPublicMethods;
 #endif
 
-    public static SourceAccessibility GetAccessibility(this MethodBase method)
+    internal static SourceAccessibility GetAccessibility(this MethodBase method)
     {
         if (method.IsPublic) return SourceAccessibility.Public;
         if (method.IsFamilyAndAssembly) return SourceAccessibility.ProtectedOrInternal;
@@ -28,7 +28,7 @@ internal static class ReflectionExtensions
         return SourceAccessibility.Private;
     }
 
-    public static SourceAccessibility GetAccessibility(this FieldInfo field)
+    internal static SourceAccessibility GetAccessibility(this FieldInfo field)
     {
         if (field.IsPublic) return SourceAccessibility.Public;
         if (field.IsFamilyAndAssembly) return SourceAccessibility.ProtectedOrInternal;
@@ -37,18 +37,47 @@ internal static class ReflectionExtensions
         return SourceAccessibility.Private;
     }
 
-    public static SourceAccessibility GetAccessibility(this PropertyInfo property)
+    internal static SourceAccessibility GetAccessibility(this PropertyInfo property)
     {
         return property.CanRead ? property.GetMethod!.GetAccessibility() : property.SetMethod!.GetAccessibility();
     }
 
     private static readonly Type IsExternalInitType = typeof(System.Runtime.CompilerServices.IsExternalInit);
-    public static bool IsInitOnly(this PropertyInfo propertyInfo)
+    internal static bool IsInitOnly(this PropertyInfo propertyInfo)
     {
         MethodInfo? setMethod = propertyInfo.SetMethod;
         if (setMethod == null)
             return false;
 
         return setMethod.ReturnParameter.GetRequiredCustomModifiers().Contains(IsExternalInitType);
+    }
+
+    public static MethodInfo? FindGenericMethod(this Type type, string name, int typeParameterCount, string[] parameterTypes)
+    {
+        foreach (var method in type.GetMethods(DeclaredOnlyLookup))
+        {
+            if (!method.IsGenericMethod)
+                continue;
+
+            if (method.Name != name)
+                continue;
+
+            if (method.GetGenericArguments().Length != typeParameterCount)
+                continue;
+
+            var parameters = method.GetParameters();
+            if (parameters.Length != parameterTypes.Length)
+                continue;
+
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                if (parameters[i].ParameterType.ToString() != parameterTypes[i])
+                    continue;
+            }
+
+            return method;
+        }
+
+        return null;
     }
 }
