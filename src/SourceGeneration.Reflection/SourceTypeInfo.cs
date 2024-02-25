@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.ComponentModel;
+using System.Reflection;
 
 namespace SourceGeneration.Reflection;
 
@@ -27,6 +28,12 @@ public class SourceTypeInfo : SourceMemberInfo
 #endif
     public Type? BaseType { get; init; }
 
+    [EditorBrowsable(EditorBrowsableState.Never)]
+#if NET5_0_OR_GREATER
+    [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(ReflectionExtensions.DefaultAccessMembers)]
+#endif
+    public Type ArrayType { get; init; } = default!;
+
     public Type? EnumUnderlyingType { get; init; }
 
     public bool IsRecord { get; init; }
@@ -36,10 +43,13 @@ public class SourceTypeInfo : SourceMemberInfo
     public bool IsReadOnly { get; init; }
     public bool IsReflected { get; init; }
 
+
     public SourcePropertyInfo[] DeclaredProperties { get; init; } = default!;
     public SourceMethodInfo[] DeclaredMethods { get; init; } = default!;
     public SourceConstructorInfo[] DeclaredConstructors { get; init; } = default!;
     public SourceFieldInfo[] DeclaredFields { get; init; } = default!;
+
+    public SourceTypeInfo MarkArrayType() => SourceReflector.GetRequiredType(ArrayType, true);
 
     public SourcePropertyInfo[] GetProperties() => EnumerableInherit(this).SelectMany(x => x.DeclaredProperties).ToArray();
     public SourceFieldInfo[] GetFields() => EnumerableInherit(this).SelectMany(x => x.DeclaredFields).ToArray();
