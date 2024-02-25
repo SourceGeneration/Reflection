@@ -17,6 +17,7 @@ SourceReflection aims to provide a more universal solution, offering `AOTable` R
 - Record
 - Struct (ref struct is not supports)
 - Enum
+- GenericType(just handle known types)
 
 **Supports the the following members**
 - Field
@@ -26,10 +27,10 @@ SourceReflection aims to provide a more universal solution, offering `AOTable` R
 - Constructor
 
 **Unsupports**
-- GenericType
-- GenericMethod*
+- Generic type definition
+- Generic method *
 
-> Currently, support for generic types is not yet available. The main issue lies in the handling of `MarkGenericType`. Although the source generation can handle some known types, the results are not particularly satisfactory. I am currently experimenting with more effective approaches, but there is no specific plan at the moment.
+> Currently, support for generic type definition is not yet available. The main issue lies in the handling of `MarkGenericType`. I am currently experimenting with more effective approaches, but there is no specific plan at the moment.
 
 > Similar to generic types, there are also generic methods. The issue lies in `MarkGenericMethod`. However, it can currently handle some specific cases, such as situations where the generic type can be inferred.
 
@@ -310,6 +311,36 @@ You don't need to worry about whether the user has marked an object with the `So
 
 `SourceReflection` globally caching all objects (Type, FieldInfo, PropertyInfo, MethodInfo, ConstructorInfo) in a static cache.
 
+## Generic Definition
+
+Currently, support for generic type definition is not yet available. The main issue lies in the handling of `MarkGenericType`. I am currently experimenting with more effective approaches, but there is no specific plan at the moment.
+
+```c#
+[assembly: SourceReflectionType(typeof(List<>))]
+
+[SourceReflection]
+public class GenericTypeDefinitionTestObject<T> { }
+```
+
+```c#
+//Can not generate generic type definition info
+Assert.IsNull(SourceReflector.GetType<List<>>());
+Assert.IsNull(SourceReflector.GetType<GenericTypeDefinitionTestObject<>>());
+```
+
+## Generic Type
+
+Currently, support for generic type definition is not yet available. The main issue lies in the handling of `MarkGenericType`. The source generation can handle handle known types.
+
+```c#
+[assembly: SourceReflectionType(typeof(List<string>))]
+
+var type = SourceReflector.GetRequiredType<List<string>>();
+List<string> list = ["a", "b"];
+type.GetMethod("Add")!.Invoke(list, ["c"]);
+Assert.AreEqual(3, type.GetProperty("Count")!.GetValue(list));
+```
+
 ## Generic Method
 
 For generic methods with inferable types, they can be called using source generation
@@ -328,6 +359,7 @@ public class GenericMethodTestObject
     public T[] InvokeArray1<T>(T[] t) => t;
 }
 ```
+
 ```c#
 SourceTypeInfo type = SourceReflector.GetRequiredType<GenericMethodTestObject>();
 GenericMethodTestObject instance = new();
@@ -360,6 +392,7 @@ public class GenericMethodTestObject
     public string Invoke2<T>(T value) where T : ICloneable => typeof(T).Name;
 }
 ```
+
 ```c#
 var type = SourceReflector.GetRequiredType<GenericMethodTestInferObject>();
 GenericMethodTestInferObject instance = new();
