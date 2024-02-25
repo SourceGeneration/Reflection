@@ -3,7 +3,6 @@ using SourceGeneration.Reflection.SourceGenerator;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 
 namespace SourceGeneration.Reflection;
@@ -17,6 +16,7 @@ public partial class ReflectionSourceGenerator
 
     private static readonly SymbolDisplayFormat QualifiedNameFormat = new(
             globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Omitted,
+            genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
             typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces);
 
     private static IEnumerable<SourceTypeInfo> Parse(IAssemblySymbol assemblySymbol, IEnumerable<INamedTypeSymbol> typeSymbols, CancellationToken cancellationToken)
@@ -56,7 +56,7 @@ public partial class ReflectionSourceGenerator
             Name = typeSymbol.Name,
             BaseType = typeSymbol.BaseType.ToDisplayString(GlobalTypeDisplayFormat),
             EnumUnderlyingType = typeSymbol.EnumUnderlyingType.ToDisplayString(GlobalTypeDisplayFormat),
-            FullName = fullname.StartsWith("global::") ? fullname.Substring(8) : fullname,
+            FullName = typeSymbol.ToDisplayString(QualifiedNameFormat),
             FullGlobalName = fullname,
             IsEnum = true,
             Accessibility = typeSymbol.DeclaredAccessibility,
@@ -89,7 +89,7 @@ public partial class ReflectionSourceGenerator
         {
             Name = typeSymbol.Name,
             BaseType = typeSymbol.BaseType?.ToDisplayString(GlobalTypeDisplayFormat),
-            FullName = fullname.StartsWith("global::") ? fullname.Substring(8) : fullname,
+            FullName = typeSymbol.ToDisplayString(QualifiedNameFormat),
             FullGlobalName = fullname,
             IsAbstract = typeSymbol.IsAbstract,
             IsStatic = typeSymbol.IsStatic,
