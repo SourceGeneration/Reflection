@@ -13,7 +13,7 @@ public partial class ReflectionSourceGenerator
     private static readonly SymbolDisplayFormat GlobalTypeDisplayFormat = new SymbolDisplayFormat(
                 SymbolDisplayGlobalNamespaceStyle.Included, SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces)
                 .WithGenericsOptions(SymbolDisplayGenericsOptions.IncludeTypeParameters);
-            //.AddMiscellaneousOptions(SymbolDisplayMiscellaneousOptions.UseSpecialTypes/* | SymbolDisplayMiscellaneousOptions.ExpandNullable*/);
+    //.AddMiscellaneousOptions(SymbolDisplayMiscellaneousOptions.UseSpecialTypes/* | SymbolDisplayMiscellaneousOptions.ExpandNullable*/);
 
     private static readonly SymbolDisplayFormat QualifiedNameFormat = new(
             globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Omitted,
@@ -118,12 +118,22 @@ public partial class ReflectionSourceGenerator
                 IsRequired = property.IsRequired,
                 IsAbstract = property.IsAbstract,
                 IsStatic = property.IsStatic,
+                IsIndexer = property.IsIndexer,
                 CanRead = property.GetMethod != null,
                 CanWrite = property.SetMethod != null,
                 IsInitOnly = property.SetMethod?.IsInitOnly == true,
                 GetMethodAccessibility = property.GetMethod?.DeclaredAccessibility ?? Accessibility.NotApplicable,
                 SetMethodAccessibility = property.SetMethod?.DeclaredAccessibility ?? Accessibility.NotApplicable,
                 PropertyType = property.Type.ToDisplayString(GlobalTypeDisplayFormat),
+                Parameters = property.Parameters.Select(x => new SourceParameterInfo
+                {
+                    Name = x.Name,
+                    ParameterType = x.Type.ToDisplayString(GlobalTypeDisplayFormat),
+                    NullableAnnotation = x.NullableAnnotation,
+                    HasDefaultValue = x.HasExplicitDefaultValue,
+                    HasNestedTypeParameter = x.Type.TypeKind == TypeKind.TypeParameter,
+                    DefaultValue = x.HasExplicitDefaultValue ? x.ExplicitDefaultValue : null,
+                }).ToList(),
             };
 
             typeInfo.Properties.Add(propertyInfo);
