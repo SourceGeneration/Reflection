@@ -2,6 +2,17 @@
 
 namespace SourceGeneration.Reflection;
 
+//public class SourceArrayTypeInfo : SourceTypeInfo
+//{
+//    public SourceArrayTypeInfo(Type type)
+//    {
+
+//        DeclaredProperties = [
+//            new SourcePropertyInfo(() => Type.GetProperty("Length")!)
+//            ]
+//    }
+//}
+
 public class SourceTypeInfo : SourceMemberInfo
 {
     public SourceAccessibility Accessibility { get; init; }
@@ -35,21 +46,6 @@ public class SourceTypeInfo : SourceMemberInfo
     public SourceConstructorInfo[] GetConstructors() => EnumerableInherit(this).SelectMany(x => x.DeclaredConstructors).ToArray();
     public SourceMethodInfo[] GetMethods() => EnumerableInherit(this).SelectMany(x => x.DeclaredMethods).ToArray();
 
-    private static IEnumerable<SourceTypeInfo> EnumerableInherit(SourceTypeInfo type)
-    {
-        yield return type;
-        for (; ; )
-        {
-            if (type.BaseType == null)
-                break;
-
-            type = SourceReflector.GetType(type.BaseType, type.IsReflected)!;
-            if (type == null)
-                break;
-            yield return type;
-        }
-    }
-
     public SourcePropertyInfo? GetProperty(string name) => GetProperties().FirstOrDefault(x => x.Name == name);
 
     public SourceFieldInfo? GetField(string name) => GetFields().FirstOrDefault(x => x.Name == name);
@@ -71,6 +67,21 @@ public class SourceTypeInfo : SourceMemberInfo
     public SourceConstructorInfo? GetConstructor(Type[] types)
     {
         return GetConstructors().FirstOrDefault(x => x.Parameters.Select(p => p.ParameterType).SequenceEqual(types));
+    }
+
+    private static IEnumerable<SourceTypeInfo> EnumerableInherit(SourceTypeInfo type)
+    {
+        yield return type;
+        for (; ; )
+        {
+            if (type.BaseType == null)
+                break;
+
+            type = SourceReflector.GetType(type.BaseType, type.IsReflected)!;
+            if (type == null)
+                break;
+            yield return type;
+        }
     }
 
 }

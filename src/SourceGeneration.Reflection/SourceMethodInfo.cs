@@ -12,7 +12,14 @@ public class SourceMethodInfo(Func<MethodInfo> getMethodInfo) : SourceMethodBase
 #if NET5_0_OR_GREATER
     [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(ReflectionExtensions.DefaultAccessMembers)]
 #endif
-    public Type ReturnType { get; init; } = default!;
+
+    private Type? _returnType;
+
+    public Type ReturnType
+    {
+        get => _returnType ??= MethodInfo.ReturnType;
+        init => _returnType = value;
+    }
 
     public SourceNullableAnnotation ReturnNullableAnnotation { get; init; } = default!;
 

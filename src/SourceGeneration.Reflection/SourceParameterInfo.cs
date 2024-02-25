@@ -14,4 +14,10 @@ public class SourceParameterInfo
     public object? DefaultValue { get; init; } = default!;
     public SourceNullableAnnotation NullableAnnotation { get; init; }
 
+    //private Func<ParameterInfo>? _parameterInfoAccess;
+    //public ParameterInfo ParameterInfo
+    //{
+    //    get => 
+    //}
+
 }

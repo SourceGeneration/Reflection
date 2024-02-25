@@ -6,6 +6,7 @@ namespace SourceGeneration.Reflection;
 internal class SourceTypeInfo
 {
     public string BaseType;
+    public string FullGlobalName;
     public string FullName;
     public string Name;
     public bool IsAbstract;
@@ -22,7 +23,6 @@ internal class SourceTypeInfo
     public readonly List<SourcePropertyInfo> Properties = [];
     public readonly List<SourceMethodInfo> Methods = [];
     public readonly List<SourceConstructorInfo> Constructors = [];
-
 
     public bool IsEnum;
     public string EnumUnderlyingType;

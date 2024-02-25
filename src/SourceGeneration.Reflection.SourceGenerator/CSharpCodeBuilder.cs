@@ -31,6 +31,8 @@ public class CSharpCodeBuilder
             _indent -= IndentLength;
     }
 
+    public void Clear() => _builder.Clear();
+
     public void Append(string value) => _builder.Append(value);
 
     public void Append(char value) => _builder.Append(value);
