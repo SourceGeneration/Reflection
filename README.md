@@ -21,21 +21,45 @@ SourceReflection aims to provide a more universal solution, offering `AOTable` R
 **Supports the the following members**
 - Field
 - Property
+- Indexer
 - Method
 - Constructor
+
+**Unsupports**
+- GenericType
+- GenericMethod*
+
+> Currently, support for generic types is not yet available. The main issue lies in the handling of `MarkGenericType`. Although the source generation can handle some known types, the results are not particularly satisfactory. I am currently experimenting with more effective approaches, but there is no specific plan at the moment.
+
+> Similar to generic types, there are also generic methods. The issue lies in `MarkGenericMethod`. However, it can currently handle some specific cases, such as situations where the generic type can be inferred.
+
 
 ## Installing Reflection
 
 ```powershell
-Install-Package SourceGeneration.Reflection -Version 1.0.0-beta2.240222.1
+Install-Package SourceGeneration.Reflection -Version 1.0.0-beta2.240225.1
 ```
 ```powershell
-dotnet add package SourceGeneration.Reflection --version 1.0.0-beta2.240222.1
+dotnet add package SourceGeneration.Reflection --version 1.0.0-beta2.240225.1
 ```
 
-## Start
+## Source Reflection
 
-Add `SourceReflectionAttribute` to your class
+SourceReflection requires using an attribute to mark the type
+- Adding `[SourceReflectionAttribute]` to type.
+- Adding `SourceReflectionTypeAttribute]` to assembly, it is possible to specify types from other assemblies
+
+```c#
+[assembly: SourceReflectionType<object>]
+[assembly: SourceReflectionType(typeof(Enumerable))]
+
+[SourceReflection]
+public class Goods { }
+```
+
+## Basic
+
+Add `[SourceReflectionAttribute]` to your class
 ```c#
 using SourceGeneration.Reflection;
 
@@ -285,6 +309,63 @@ public class SourcePropertyInfo
 You don't need to worry about whether the user has marked an object with the `SourceReflectionAttribute`. You can use the `SourceReflection` to retrieve metadata or invoke methods in a generic way regardless of whether the attribute is used.
 
 `SourceReflection` globally caching all objects (Type, FieldInfo, PropertyInfo, MethodInfo, ConstructorInfo) in a static cache.
+
+## Generic Method
+
+For generic methods with inferable types, they can be called using source generation
+
+```c#
+[SourceReflection]
+public class GenericMethodTestObject
+{
+    public T Invoke0<T>() => default!;
+    public T Invoke1<T>(T t) => t;
+    public T Invoke2<T>(T t) where T : ICloneable => t;
+    public T Invoke3<T>(T t) where T : unmanaged => t;
+    public T Invoke4<T>(T t) where T : notnull => t;
+    public T Invoke5<T>(T t) where T : ICloneable, IComparable => t;
+    public T Invoke6<T, K>(T t, K k) where T : ICloneable where K : IComparable => t;
+    public T[] InvokeArray1<T>(T[] t) => t;
+}
+```
+```c#
+SourceTypeInfo type = SourceReflector.GetRequiredType<GenericMethodTestObject>();
+GenericMethodTestObject instance = new();
+
+// Success
+type.GetMethod("Invoke1").Invoke(instance, [1]);
+type.GetMethod("Invoke2").Invoke(instance, [1]);
+type.GetMethod("Invoke4").Invoke(instance, [1]);
+type.GetMethod("Invoke5").Invoke(instance, [1]);
+type.GetMethod("Invoke6").Invoke(instance, [1, 2]);
+
+//Error
+type.GetMethod("Invoke0").Invoke(instance, []);
+type.GetMethod("Invoke3").Invoke(instance, [1]);
+type.GetMethod("InvokeArray1").Invoke(instance, [new int[] { 1 }]);
+```
+
+When the generic type cannot be inferred, the only option is to use runtime reflection through `MarkGenericMethod`, which will not be supported in AOT compilation.
+
+```c#
+type.GetMethod("Invoke0").MethodInfo.MarkGenericMethod([]).Invoke(instance);
+```
+
+Even if the type can be inferred, this approach has its drawbacks. If the internal implementation of the method has type checks on the generic parameters, the result may not meet expectations.
+
+```c#
+public class GenericMethodTestObject
+{
+    public string Invoke1<T>(T value) => typeof(T).Name;
+    public string Invoke2<T>(T value) where T : ICloneable => typeof(T).Name;
+}
+```
+```c#
+var type = SourceReflector.GetRequiredType<GenericMethodTestInferObject>();
+GenericMethodTestInferObject instance = new();
+Assert.AreEqual("Object", type.GetMethod("Invoke1")!.Invoke(instance, [1]));
+Assert.AreEqual("ICloneable", type.GetMethod("Invoke2")!.Invoke(instance, ["a"]));
+```
 
 ## Samples
 
