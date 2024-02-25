@@ -8,7 +8,7 @@ namespace SourceGeneration.Reflection.SourceGenerator.Test
         {
             string source = @"
 //[assembly: SourceReflectionAttribute<SourceGeneration.Reflection.Sample2.EnumTestObject>]
-[assembly: SourceReflectionType(typeof(System.Collections.Generic.List<>))]
+[assembly: SourceReflectionType(typeof(System.Collections.Generic.List<string>))]
 using System;
 using System.Threading.Tasks;
 using SourceGeneration.Reflection;
