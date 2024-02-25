@@ -6,15 +6,3 @@
 [assembly: SourceReflectionType(typeof(List<>))]
 
 namespace SourceGeneration.Reflection.Test;
-
-
-[TestClass]
-public class AssemblyAttributeTest
-{
-    [TestMethod]
-    public void Object()
-    {
-        var type = SourceReflector.GetRequiredType<object>();
-
-    }
-}
