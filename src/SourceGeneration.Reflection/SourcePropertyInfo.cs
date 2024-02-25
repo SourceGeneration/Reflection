@@ -6,6 +6,10 @@ public class SourcePropertyInfo(Func<PropertyInfo> propertyInfoAccess) : SourceM
 {
     private Func<object?, object?>? _getMethod;
     private Action<object?, object?>? _setMethod;
+
+    private Func<object?, object?[]?, object?>? _getIndexerMethod;
+    private Action<object?, object?, object?[]?>? _setIndexerMethod;
+
     private PropertyInfo? _propertyInfo;
 
     public PropertyInfo PropertyInfo => _propertyInfo ??= propertyInfoAccess();
@@ -22,6 +26,9 @@ public class SourcePropertyInfo(Func<PropertyInfo> propertyInfoAccess) : SourceM
     public bool IsAbstract { get; init; }
     public bool IsStatic { get; init; }
     public bool IsInitOnly { get; init; }
+    public bool IsIndexer { get; init; }
+    public SourceParameterInfo[] IndexerParameters { get; init; } = [];
+
     public SourceNullableAnnotation NullableAnnotation { get; init; }
 
     public bool CanWrite { get; init; }
@@ -37,6 +44,18 @@ public class SourcePropertyInfo(Func<PropertyInfo> propertyInfoAccess) : SourceM
     {
         get => _setMethod ?? PropertyInfo.SetValue;
         init => _setMethod = value;
+    }
+
+    public Action<object?, object?, object?[]?> SetIndexerValue
+    {
+        get => _setIndexerMethod ?? PropertyInfo.SetValue;
+        init => _setIndexerMethod = value;
+    }
+
+    public Func<object?, object?[]?, object?> GetIndexerValue
+    {
+        get => _getIndexerMethod ?? PropertyInfo.GetValue;
+        init => _getIndexerMethod = value;
     }
 
 #if NET5_0_OR_GREATER
