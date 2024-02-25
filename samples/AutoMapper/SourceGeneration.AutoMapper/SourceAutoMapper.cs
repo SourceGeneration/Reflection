@@ -14,26 +14,65 @@ public static class SourceAutoMapper
         if (source == null)
             return default;
 
-        var sourceType = SourceReflector.GetType<TSource>(true)!;
-        var targetType = SourceReflector.GetType<TTarget>(true)!;
+        var sourceType = SourceReflector.GetRequiredType<TSource>(true);
+        var targetType = SourceReflector.GetRequiredType<TTarget>(true);
 
         TTarget target = new();
+
+        return (TTarget)Map(sourceType, targetType, source, target, propertyNameCaseInsensitive)!;
+    }
+
+    private static object? Map(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] SourceTypeInfo sourceType,
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] SourceTypeInfo targetType,
+        object source,
+        object target,
+        bool propertyNameCaseInsensitive = true)
+    {
+        if (source == null)
+            return default;
 
         StringComparison stringComparison = propertyNameCaseInsensitive ? StringComparison.CurrentCultureIgnoreCase : StringComparison.CurrentCulture;
 
         foreach (var property in sourceType.GetProperties().Where(x => x.Accessibility == SourceAccessibility.Public && x.CanRead))
         {
-            var targetProperty = targetType.GetProperties().FirstOrDefault(x 
-                => x.Accessibility == SourceAccessibility.Public 
-                && string.Equals(x.Name, property.Name, StringComparison.OrdinalIgnoreCase) 
-                && x.PropertyType.IsAssignableFrom(property.PropertyType));
+            var targetProperty = targetType.GetProperties().FirstOrDefault(x
+                => x.Accessibility == SourceAccessibility.Public
+                && !x.IsStatic
+                && string.Equals(x.Name, property.Name, StringComparison.OrdinalIgnoreCase));
 
-            if (targetProperty != null && targetProperty.CanWrite && !targetProperty.IsInitOnly)
+            if (targetProperty != null && targetProperty.CanWrite)
             {
-                targetProperty.SetValue(target, property.GetValue(source));
+                if (targetProperty.PropertyType.IsAssignableFrom(property.PropertyType))
+                {
+                    targetProperty.SetValue(target, property.GetValue(source));
+                }
+                else if (targetProperty.PropertyType.IsValueType || property.PropertyType.IsValueType)
+                {
+                    continue;
+                }
+                else
+                {
+                    var propertySource = property.GetValue(source);
+                    if (propertySource == null)
+                    {
+                        targetProperty.SetValue(target, null);
+                    }
+                    else
+                    {
+                        var proeprtySourceType = SourceReflector.GetRequiredType(property.PropertyType, true);
+                        var propertyTargetType = SourceReflector.GetRequiredType(targetProperty.PropertyType, true);
+                        var propertyTargetInstance = SourceReflector.CreateInstance(targetProperty.PropertyType, []);
+
+                        var targetValue = Map(proeprtySourceType, propertyTargetType, propertySource, propertyTargetInstance);
+
+                        targetProperty.SetValue(target, targetValue);
+                    }
+                }
             }
         }
 
         return target;
     }
+
 }

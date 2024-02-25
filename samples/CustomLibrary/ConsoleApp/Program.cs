@@ -3,7 +3,10 @@ using CustomLibrary2;
 using SourceGeneration.Reflection;
 using System.ComponentModel.DataAnnotations;
 
+[assembly: SourceReflectionType<D>]
+
 var types = SourceReflector.GetTypes();
+
 
 foreach (var type in types)
 {

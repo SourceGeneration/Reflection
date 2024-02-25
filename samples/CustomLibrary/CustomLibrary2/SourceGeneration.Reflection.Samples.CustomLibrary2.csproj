@@ -4,8 +4,8 @@
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<LangVersion>12</LangVersion>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		
-		<Version>1.0.0-beta1.240215.1</Version>
+
+		<Version>1.0.0-beta1.240225.1</Version>
 
 		<RepositoryUrl>https://github.com/SourceGeneration/Reflection</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -15,7 +15,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="SourceGeneration.Reflection" Version="1.0.0-beta1.240215.1" />
+		<PackageReference Include="SourceGeneration.Reflection" Version="1.0.0-beta2.240225.1" />
 		<None Update="SourceGeneration.Reflection.Samples.CustomLibrary2.props">
 			<PackagePath>build</PackagePath>
 			<Pack>true</Pack>

@@ -8,7 +8,7 @@
 		<PublishAot>true</PublishAot>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="SourceGeneration.Reflection" Version="1.0.0-beta2.240222.1" />
+		<PackageReference Include="SourceGeneration.Reflection" Version="1.0.0-beta2.240225.1" />
 	</ItemGroup>
 
 </Project>

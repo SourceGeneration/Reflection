@@ -13,11 +13,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<AdditionalFiles Include="SourceReflection.txt" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <PackageReference Include="SourceGeneration.Reflection.Samples.CustomLibrary1" Version="1.0.0-beta1.240215.1" />
-	  <PackageReference Include="SourceGeneration.Reflection.Samples.CustomLibrary2" Version="1.0.0-beta1.240215.1" />
+	  <PackageReference Include="SourceGeneration.Reflection.Samples.CustomLibrary1" Version="1.0.0-beta1.240225.1" />
+	  <PackageReference Include="SourceGeneration.Reflection.Samples.CustomLibrary2" Version="1.0.0-beta1.240225.1" />
 	</ItemGroup>
 </Project>

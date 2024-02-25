@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SourceGeneration.Reflection" Version="1.0.0-beta1.240217.1" />
+    <PackageReference Include="SourceGeneration.Reflection" Version="1.0.0-beta2.240225.2" />
   </ItemGroup>
 
 </Project>
