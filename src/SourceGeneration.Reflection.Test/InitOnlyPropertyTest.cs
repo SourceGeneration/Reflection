@@ -29,7 +29,6 @@ public class InitOnlyPropertyTest
         Assert.AreEqual(1, instance.RequiredProperty);
         Assert.AreEqual(1, instance.Property);
     }
-
 }
 
 [SourceReflection]

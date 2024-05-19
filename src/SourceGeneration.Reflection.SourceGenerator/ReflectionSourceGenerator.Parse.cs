@@ -34,11 +34,11 @@ public partial class ReflectionSourceGenerator
 
             if (typeSymbol.TypeKind == TypeKind.Enum)
             {
-                yield return PaseEnum(typeSymbol);
+                yield return PaseEnumType(typeSymbol);
             }
             else
             {
-                yield return ParseType(typeSymbol);
+                yield return ParseClassType(typeSymbol);
             }
 
             if (typeSymbol.BaseType != null && typeSymbol.BaseType.ContainingAssembly.Equals(assemblySymbol, SymbolEqualityComparer.Default) && !typeSymbols.Contains(typeSymbol.BaseType, SymbolEqualityComparer.Default))
@@ -48,7 +48,7 @@ public partial class ReflectionSourceGenerator
         }
     }
 
-    private static SourceTypeInfo PaseEnum(INamedTypeSymbol typeSymbol)
+    private static SourceTypeInfo PaseEnumType(INamedTypeSymbol typeSymbol)
     {
         var fullname = typeSymbol.ToDisplayString(GlobalTypeDisplayFormat);
         SourceTypeInfo typeInfo = new()
@@ -70,7 +70,7 @@ public partial class ReflectionSourceGenerator
         return typeInfo;
     }
 
-    private static SourceTypeInfo ParseType(INamedTypeSymbol typeSymbol)
+    private static SourceTypeInfo ParseClassType(INamedTypeSymbol typeSymbol)
     {
         string fullname;
         bool isGenericTypeDefinition;
@@ -102,12 +102,14 @@ public partial class ReflectionSourceGenerator
             Accessibility = typeSymbol.DeclaredAccessibility,
         };
 
-        foreach (var field in typeSymbol.GetMembers().OfType<IFieldSymbol>())
+        var members = typeSymbol.GetMembers();
+
+        foreach (var field in members.OfType<IFieldSymbol>())
         {
             typeInfo.Fields.Add(CreateField(field));
         }
 
-        foreach (var property in typeSymbol.GetMembers().OfType<IPropertySymbol>())
+        foreach (var property in members.OfType<IPropertySymbol>())
         {
             SourcePropertyInfo propertyInfo = new()
             {
@@ -161,9 +163,7 @@ public partial class ReflectionSourceGenerator
             typeInfo.Constructors.Add(constructorInfo);
         }
 
-        foreach (var method in typeSymbol.GetMembers()
-            .OfType<IMethodSymbol>()
-            .Where(x => x.MethodKind == MethodKind.Ordinary && !x.IsImplicitlyDeclared))
+        foreach (var method in members.OfType<IMethodSymbol>().Where(x => x.MethodKind == MethodKind.Ordinary && !x.IsImplicitlyDeclared))
         {
             SourceMethodInfo methodInfo = new()
             {
@@ -193,7 +193,7 @@ public partial class ReflectionSourceGenerator
                     HasDefaultValue = x.HasExplicitDefaultValue,
                     IsTypeParameter = x.Type.Kind == SymbolKind.TypeParameter,
                     HasNestedTypeParameter = x.Type.HasTypeParameter(),
-                    IsRef =  x.RefKind == RefKind.Ref,
+                    IsRef = x.RefKind == RefKind.Ref,
                     IsOut = x.RefKind == RefKind.Out,
                     DefaultValue = x.HasExplicitDefaultValue ? x.ExplicitDefaultValue : null,
                     DisplayType = x.Type.ToReflectionDisplayString()

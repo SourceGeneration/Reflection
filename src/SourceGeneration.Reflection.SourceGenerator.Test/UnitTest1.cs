@@ -16,12 +16,19 @@ using SourceGeneration.Reflection;
 
 namespace SourceGeneration.Reflection.Sample2
 {
-    [SourceReflection]
-    public class IndexTestObject
+[SourceReflection]
+public class InterfaceImplementTestObject : System.ICloneable, System.IComparable
+{
+    public int CompareTo(object? obj)
     {
-        public IndexTestObject(int* a) { }
+        throw new NotImplementedException();
     }
-}
+
+    object System.ICloneable.Clone()
+    {
+        throw new NotImplementedException();
+    }
+}}
 ";
             var result = CSharpTestGenerator.Generate<ReflectionSourceGenerator>(source, typeof(SourceReflectionAttribute).Assembly);
             var script = result.RunResult.GeneratedTrees.FirstOrDefault()?.GetText();
