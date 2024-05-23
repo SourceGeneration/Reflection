@@ -150,7 +150,7 @@ public partial class ReflectionSourceGenerator
     private static void EmitField(CSharpCodeBuilder builder, SourceTypeInfo type, SourceFieldInfo field)
     {
         builder.AppendIndent();
-        builder.Append($"new global::SourceGeneration.Reflection.SourceFieldInfo(() => typeof({type.FullGlobalName}).GetField(\"{field.Name}\", ");
+        builder.Append($"new global::SourceGeneration.Reflection.SourceFieldInfo(static () => typeof({type.FullGlobalName}).GetField(\"{field.Name}\", ");
         AppendBindingFlags(builder, field.Accessibility, field.IsStatic);
         builder.Append("))");
         builder.AppendLine();
@@ -172,26 +172,26 @@ public partial class ReflectionSourceGenerator
             {
                 if (field.IsConst)
                 {
-                    builder.AppendLine($@"GetValue = _ => {CSharpCodeBuilder.GetConstantLiteral(field.ConstantValue)},");
+                    builder.AppendLine($@"GetValue = static _ => {CSharpCodeBuilder.GetConstantLiteral(field.ConstantValue)},");
                 }
                 else if (field.IsStatic)
                 {
-                    builder.AppendLine($@"GetValue = instance => {type.FullGlobalName}.{field.Name},");
+                    builder.AppendLine($@"GetValue = static instance => {type.FullGlobalName}.{field.Name},");
                 }
                 else
                 {
-                    builder.AppendLine($@"GetValue = instance => (({type.FullGlobalName})instance).{field.Name},");
+                    builder.AppendLine($@"GetValue = static instance => (({type.FullGlobalName})instance).{field.Name},");
                 }
 
                 if (!type.IsStruct && !field.IsReadOnly && !field.IsConst)
                 {
                     if (field.IsStatic)
                     {
-                        builder.AppendLine($@"SetValue = (instance, value) => {type.FullGlobalName}.{field.Name} = ({field.FieldType})value");
+                        builder.AppendLine($@"SetValue = static (instance, value) => {type.FullGlobalName}.{field.Name} = ({field.FieldType})value");
                     }
                     else
                     {
-                        builder.AppendLine($@"SetValue = (instance, value) => (({type.FullGlobalName})instance).{field.Name} = ({field.FieldType})value");
+                        builder.AppendLine($@"SetValue = static (instance, value) => (({type.FullGlobalName})instance).{field.Name} = ({field.FieldType})value");
                     }
                 }
             }
@@ -202,7 +202,7 @@ public partial class ReflectionSourceGenerator
     private static void EmitProperty(CSharpCodeBuilder builder, SourceTypeInfo type, SourcePropertyInfo property)
     {
         builder.AppendIndent();
-        builder.Append($"new global::SourceGeneration.Reflection.SourcePropertyInfo(() => typeof({type.FullGlobalName}).GetProperty(\"{property.Name}\", ");
+        builder.Append($"new global::SourceGeneration.Reflection.SourcePropertyInfo(static () => typeof({type.FullGlobalName}).GetProperty(\"{property.Name}\", ");
         AppendBindingFlags(builder, property.Accessibility, property.IsStatic);
         builder.Append("))");
         builder.AppendLine();
@@ -233,21 +233,21 @@ public partial class ReflectionSourceGenerator
                 {
                     if (property.IsStatic)
                     {
-                        builder.AppendLine($@"GetValue = instance => {type.FullGlobalName}.{property.Name},");
+                        builder.AppendLine($@"GetValue = static instance => {type.FullGlobalName}.{property.Name},");
                     }
                     else
                     {
                         if (property.IsIndexer)
                         {
                             builder.AppendIndent();
-                            builder.Append($@"GetIndexerValue = (instance, parameters) => (({type.FullGlobalName})instance)[");
+                            builder.Append($@"GetIndexerValue = static (instance, parameters) => (({type.FullGlobalName})instance)[");
                             AppendMethodArguments(builder, property.Parameters);
                             builder.Append("],");
                             builder.AppendLine();
                         }
                         else
                         {
-                            builder.AppendLine($@"GetValue = instance => (({type.FullGlobalName})instance).{property.Name},");
+                            builder.AppendLine($@"GetValue = static instance => (({type.FullGlobalName})instance).{property.Name},");
                         }
                     }
                 }
@@ -256,21 +256,21 @@ public partial class ReflectionSourceGenerator
                 {
                     if (property.IsStatic)
                     {
-                        builder.AppendLine($@"SetValue = (instance, value) => {type.FullGlobalName}.{property.Name} = ({property.PropertyType})value");
+                        builder.AppendLine($@"SetValue = static (instance, value) => {type.FullGlobalName}.{property.Name} = ({property.PropertyType})value");
                     }
                     else
                     {
                         if (property.IsIndexer)
                         {
                             builder.AppendIndent();
-                            builder.Append($@"SetIndexerValue = (instance, value, parameters) => (({type.FullGlobalName})instance)[");
+                            builder.Append($@"SetIndexerValue = static (instance, value, parameters) => (({type.FullGlobalName})instance)[");
                             AppendMethodArguments(builder, property.Parameters);
                             builder.Append($"] = ({property.PropertyType})value");
                             builder.AppendLine();
                         }
                         else
                         {
-                            builder.AppendLine($@"SetValue = (instance, value) => (({type.FullGlobalName})instance).{property.Name} = ({property.PropertyType})value");
+                            builder.AppendLine($@"SetValue = static (instance, value) => (({type.FullGlobalName})instance).{property.Name} = ({property.PropertyType})value");
                         }
                     }
                 }
@@ -285,13 +285,13 @@ public partial class ReflectionSourceGenerator
 
         if (method.IsGenericMethod)
         {
-            builder.Append($"new global::SourceGeneration.Reflection.SourceMethodInfo(() => global::SourceGeneration.Reflection.ReflectionExtensions.FindGenericMethod(typeof({type.FullGlobalName}), \"{method.Name}\", {method.TypeParameters.Length}, ");
+            builder.Append($"new global::SourceGeneration.Reflection.SourceMethodInfo(static () => global::SourceGeneration.Reflection.ReflectionExtensions.FindGenericMethod(typeof({type.FullGlobalName}), \"{method.Name}\", {method.TypeParameters.Length}, ");
 
             builder.AppendArrayInitializer("global::System.String", method.Parameters.Select(x => $"\"{x.DisplayType}\"").ToArray());
         }
         else
         {
-            builder.Append($"new global::SourceGeneration.Reflection.SourceMethodInfo(() => typeof({type.FullGlobalName}).GetMethod(\"{method.Name}\", ");
+            builder.Append($"new global::SourceGeneration.Reflection.SourceMethodInfo(static () => typeof({type.FullGlobalName}).GetMethod(\"{method.Name}\", ");
             AppendBindingFlags(builder, method.Accessibility, method.IsStatic);
             builder.Append(", ");
             builder.AppendArrayInitializer("global::System.Type", method.Parameters.Select(x => $"typeof({x.ParameterType})").ToArray());
@@ -316,7 +316,7 @@ public partial class ReflectionSourceGenerator
             if (!type.IsGenericTypeDefinition && !type.IsRefLikeType && method.CanInvoke())
             {
                 builder.AppendIndent();
-                builder.Append("Invoke = (instance, parameters) => ");
+                builder.Append("Invoke = static (instance, parameters) => ");
 
                 if (method.ReturnType == "void")
                 {
@@ -372,7 +372,7 @@ public partial class ReflectionSourceGenerator
     private static void EmitConstructor(CSharpCodeBuilder builder, SourceTypeInfo type, SourceConstructorInfo constructor)
     {
         builder.AppendIndent();
-        builder.Append($"new global::SourceGeneration.Reflection.SourceConstructorInfo(() => typeof({type.FullGlobalName}).GetConstructor(");
+        builder.Append($"new global::SourceGeneration.Reflection.SourceConstructorInfo(static () => typeof({type.FullGlobalName}).GetConstructor(");
         AppendBindingFlags(builder, constructor.Accessibility, constructor.IsStatic);
         builder.Append(", ");
         builder.AppendArrayInitializer("global::System.Type", constructor.Parameters.Select(x => $"typeof({x.ParameterType})").ToArray());
@@ -394,7 +394,7 @@ public partial class ReflectionSourceGenerator
                 !type.Properties.Any(x => x.IsRequired))
             {
                 builder.AppendIndent();
-                builder.Append($"Invoke = (parameters) => new {type.FullGlobalName}(");
+                builder.Append($"Invoke = static (parameters) => new {type.FullGlobalName}(");
                 AppendMethodArguments(builder, constructor.Parameters);
                 builder.Append(")");
                 builder.AppendLine();
