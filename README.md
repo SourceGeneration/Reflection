@@ -384,6 +384,36 @@ public class Goods
 }
 ```
 
+## System.Text.Json Adapter
+
+Supports `AOT` without JsonSerializerContext,
+`System.Text.Json` already provides a complete solution for AOT compilation, but in most cases, besides JSON serialization, there there are still many places where reflection is needed. Although different solutions can be selected for different scenarios, it may also result of more models or the marking of more attributes. SourceReflection can simplify this for JSON serialization.
+
+```powershell
+Install-Package SourceGeneration.Reflection.SystemTextJson -Version 1.0.0-beta2.240523.1
+```
+```powershell
+dotnet add package SourceGeneration.Reflection.SystemTextJson --version 1.0.0-beta2.240523.1
+```
+
+```c#
+var options = new JsonSerializerOptions
+{
+    TypeInfoResolver = new DefaultJsonTypeInfoResolver().WithSourceReflection(),
+};
+
+var json = JsonSerializer.Serialize(new Goods(), options);
+var goods = JsonSerializer.Deserialize<Model>(json, options);
+
+[SourceReflection]
+public class Goods
+{
+    private int Id { get; set; }
+    public string Name { get; private set; }
+    public double Price { get; set; }
+}
+```
+
 ## Performance & Optimization
 
 `SourceReflection` generates alternative reflection-based method invocations through source generator, for example:
@@ -426,36 +456,6 @@ public class SourcePropertyInfo
 `SourceReflection` uses lazy evaluation, which means that reflection is only performed and the result is cached when you first retrieve it.
 You don't need to worry about whether the user has marked an object with the `SourceReflectionAttribute`. You can use the `SourceReflection` to retrieve metadata or invoke methods in a generic way regardless of whether the attribute is used.
 `SourceReflection` globally caching all objects (Type, FieldInfo, PropertyInfo, MethodInfo, ConstructorInfo) in a static cache.
-
-## System.Text.Json Adapter
-
-Supports `AOT` without JsonSerializerContext,
-`System.Text.Json` already provides a complete solution for AOT compilation, but in most cases, besides JSON serialization, there there are still many places where reflection is needed. Although different solutions can be selected for different scenarios, it may also result of more models or the marking of more attributes. SourceReflection can simplify this for JSON serialization.
-
-```powershell
-Install-Package SourceGeneration.Reflection.SystemTextJson -Version 1.0.0-beta2.240523.1
-```
-```powershell
-dotnet add package SourceGeneration.Reflection.SystemTextJson --version 1.0.0-beta2.240523.1
-```
-
-```c#
-var options = new JsonSerializerOptions
-{
-    TypeInfoResolver = new DefaultJsonTypeInfoResolver().WithSourceReflection(),
-};
-
-var json = JsonSerializer.Serialize(new Goods(), options);
-var goods = JsonSerializer.Deserialize<Model>(json, options);
-
-[SourceReflection]
-public class Goods
-{
-    private int Id { get; set; }
-    public string Name { get; private set; }
-    public double Price { get; set; }
-}
-```
 
 ## Samples
 
