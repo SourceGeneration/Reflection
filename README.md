@@ -35,7 +35,9 @@ SourceReflection aims to provide a more universal solution, offering `AOTable` R
 
 > Similar to generic types, there are also generic methods. The issue lies in `MarkGenericMethod`. However, it can currently handle some specific cases, such as situations where the generic type can be inferred.
 
-
+**Adapters**
+- `System.Text.Json` Adapter, supports `AOT` without JsonSerializerContext
+  
 ## Installing Reflection
 
 ```powershell
@@ -425,9 +427,39 @@ public class SourcePropertyInfo
 You don't need to worry about whether the user has marked an object with the `SourceReflectionAttribute`. You can use the `SourceReflection` to retrieve metadata or invoke methods in a generic way regardless of whether the attribute is used.
 `SourceReflection` globally caching all objects (Type, FieldInfo, PropertyInfo, MethodInfo, ConstructorInfo) in a static cache.
 
+## System.Text.Json Adapter
+
+```powershell
+Install-Package SourceGeneration.Reflection.SystemTextJson -Version 1.0.0-beta2.240523.1
+```
+```powershell
+dotnet add package SourceGeneration.Reflection.SystemTextJson --version 1.0.0-beta2.240523.1
+```
+
+```c#
+var options = new JsonSerializerOptions
+{
+    TypeInfoResolver = new DefaultJsonTypeInfoResolver().WithSourceReflection(),
+};
+
+var json = JsonSerializer.Serialize(new Goods(), options);
+var goods = JsonSerializer.Deserialize<Model>(json, options);
+
+[SourceReflection]
+public class Goods
+{
+    private int Id { get; set; }
+    public string Name { get; private set; }
+    public double Price { get; set; }
+}
+```
+
 ## Samples
 
 - [Basic](https://github.com/SourceGeneration/Reflection/tree/main/samples/Basic) example demonstrates some basic uses of SourceReflection.
+
+- [Sytem.Text.Json Adapter](https://github.com/SourceGeneration/Reflection/tree/main/samples/SystemTextJson) example demonstrates how to uses `SourceReflection` for JsonSerializer .
+
 
 - [CsvExporter](https://github.com/SourceGeneration/Reflection/tree/main/samples/CsvWriter) is a csv file export sample.
 
