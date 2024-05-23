@@ -429,6 +429,9 @@ You don't need to worry about whether the user has marked an object with the `So
 
 ## System.Text.Json Adapter
 
+Supports `AOT` without JsonSerializerContext,
+`System.Text.Json` already provides a complete solution for AOT compilation, but in most cases, besides JSON serialization, there there are still many places where reflection is needed. Although different solutions can be selected for different scenarios, it may also result of more models or the marking of more attributes. SourceReflection can simplify this for JSON serialization.
+
 ```powershell
 Install-Package SourceGeneration.Reflection.SystemTextJson -Version 1.0.0-beta2.240523.1
 ```
