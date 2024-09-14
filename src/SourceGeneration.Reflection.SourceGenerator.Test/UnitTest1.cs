@@ -1,12 +1,14 @@
-namespace SourceGeneration.Reflection.SourceGenerator.Test
+namespace SourceGeneration.Reflection.SourceGenerator.Test;
+
+public class List2<T> : List<T> { }
+
+[TestClass]
+public class UnitTest1
 {
-    [TestClass]
-    public class UnitTest1
+    [TestMethod]
+    public void TestMethod1()
     {
-        [TestMethod]
-        public void TestMethod1()
-        {
-            string source = @"
+        string source = @"
 //[assembly: SourceReflectionAttribute<SourceGeneration.Reflection.Sample2.EnumTestObject>]
 //[assembly: SourceReflectionType(typeof(System.Collections.Generic.List<string>))]
 //[assembly: SourceReflectionType<int[]>]
@@ -19,6 +21,7 @@ namespace SourceGeneration.Reflection.Sample2
 [SourceReflection]
 public class InterfaceImplementTestObject : System.ICloneable, System.IComparable
 {
+    public  string Dic;
     public int CompareTo(object? obj)
     {
         throw new NotImplementedException();
@@ -30,10 +33,8 @@ public class InterfaceImplementTestObject : System.ICloneable, System.IComparabl
     }
 }}
 ";
-            var result = CSharpTestGenerator.Generate<ReflectionSourceGenerator>(source, typeof(SourceReflectionAttribute).Assembly);
-            var script = result.RunResult.GeneratedTrees.FirstOrDefault()?.GetText();
-            var script2 = result.RunResult.GeneratedTrees.LastOrDefault()?.GetText();
-        }
+        var result = CSharpTestGenerator.Generate<ReflectionSourceGenerator>(source, typeof(SourceReflectionAttribute).Assembly, typeof(UnitTest1).Assembly);
+        var script = result.RunResult.GeneratedTrees.FirstOrDefault()?.GetText();
+        var script2 = result.RunResult.GeneratedTrees.LastOrDefault()?.GetText();
     }
-
 }

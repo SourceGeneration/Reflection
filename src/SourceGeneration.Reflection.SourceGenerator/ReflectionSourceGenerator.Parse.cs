@@ -102,6 +102,7 @@ public partial class ReflectionSourceGenerator
             Accessibility = typeSymbol.DeclaredAccessibility,
         };
 
+
         var members = typeSymbol.GetMembers();
 
         foreach (var field in members.OfType<IFieldSymbol>())
@@ -126,6 +127,10 @@ public partial class ReflectionSourceGenerator
                 IsInitOnly = property.SetMethod?.IsInitOnly == true,
                 GetMethodAccessibility = property.GetMethod?.DeclaredAccessibility ?? Accessibility.NotApplicable,
                 SetMethodAccessibility = property.SetMethod?.DeclaredAccessibility ?? Accessibility.NotApplicable,
+
+                IsGenericDictionaryType = property.Type.IsCompliantGenericDictionaryInterface(),
+                IsGenericEnumerableType = property.Type.IsCompliantGenericEnumerableInterface(),
+
                 PropertyType = property.Type.ToDisplayString(GlobalTypeDisplayFormat),
                 Parameters = property.Parameters.Select(x => new SourceParameterInfo
                 {
@@ -219,8 +224,13 @@ public partial class ReflectionSourceGenerator
             ConstantValue = field.ConstantValue,
             IsStatic = field.IsStatic,
             IsReadOnly = field.IsReadOnly,
+
+            IsGenericDictionaryType = field.Type.IsCompliantGenericDictionaryInterface(),
+            IsGenericEnumerableType = field.Type.IsCompliantGenericEnumerableInterface(),
+
             FieldType = field.Type.ToDisplayString(GlobalTypeDisplayFormat),
         };
     }
+
 
 }
