@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using System.Linq;
 using System.Text;
 
 namespace SourceGeneration.Reflection.SourceGenerator;
@@ -78,6 +79,22 @@ internal static class TypeSymbolExtensions
         }
 
         return typeSymbol.ToDisplayString(QualifiedNameFormat);
+    }
+
+    public static bool IsCompliantGenericDictionaryInterface(this ITypeSymbol type)
+    {
+        if (type.TypeKind == TypeKind.Interface && type is INamedTypeSymbol namedType && namedType.IsGenericType && type.Name == "IDictionary")
+            return true;
+
+        return type.AllInterfaces.Any(x => x.IsGenericType && x.Name == "IDictionary");
+    }
+
+    public static bool IsCompliantGenericEnumerableInterface(this ITypeSymbol type)
+    {
+        if (type.TypeKind == TypeKind.Interface && type is INamedTypeSymbol namedType && namedType.IsGenericType && type.Name == "IEnumerable")
+            return true;
+
+        return type.AllInterfaces.Any(x => x.IsGenericType && x.Name == "IEnumerable");
     }
 
 }
