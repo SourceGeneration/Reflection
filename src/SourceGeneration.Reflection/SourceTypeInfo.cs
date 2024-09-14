@@ -3,19 +3,14 @@ using System.Reflection;
 
 namespace SourceGeneration.Reflection;
 
-//public class SourceArrayTypeInfo : SourceTypeInfo
-//{
-//    public SourceArrayTypeInfo(Type type)
-//    {
-
-//        DeclaredProperties = [
-//            new SourcePropertyInfo(() => Type.GetProperty("Length")!)
-//            ]
-//    }
-//}
-
 public class SourceTypeInfo : SourceMemberInfo
 {
+    private SourceTypeInfo[]? _baseTypes;
+    private SourceFieldInfo[]? _fields;
+    private SourceMethodInfo[]? _methods;
+    private SourcePropertyInfo[]? _properties;
+    private SourceConstructorInfo[]? _constructors;
+
     public SourceAccessibility Accessibility { get; init; }
 
 #if NET5_0_OR_GREATER
@@ -51,10 +46,10 @@ public class SourceTypeInfo : SourceMemberInfo
 
     public SourceTypeInfo MarkArrayType() => SourceReflector.GetRequiredType(ArrayType, true);
 
-    public SourcePropertyInfo[] GetProperties() => EnumerableInherit(this).SelectMany(x => x.DeclaredProperties).ToArray();
-    public SourceFieldInfo[] GetFields() => EnumerableInherit(this).SelectMany(x => x.DeclaredFields).ToArray();
-    public SourceConstructorInfo[] GetConstructors() => EnumerableInherit(this).SelectMany(x => x.DeclaredConstructors).ToArray();
-    public SourceMethodInfo[] GetMethods() => EnumerableInherit(this).SelectMany(x => x.DeclaredMethods).ToArray();
+    public SourcePropertyInfo[] GetProperties() => _properties ??= GetThisAndAncestors().Reverse().SelectMany(x => x.DeclaredProperties).ToArray();
+    public SourceFieldInfo[] GetFields() => _fields ??= GetThisAndAncestors().Reverse().SelectMany(x => x.DeclaredFields).ToArray();
+    public SourceConstructorInfo[] GetConstructors() => _constructors ??= GetThisAndAncestors().Reverse().SelectMany(x => x.DeclaredConstructors).ToArray();
+    public SourceMethodInfo[] GetMethods() => _methods ??= GetThisAndAncestors().Reverse().SelectMany(x => x.DeclaredMethods).ToArray();
 
     public SourcePropertyInfo? GetProperty(string name) => GetProperties().FirstOrDefault(x => x.Name == name);
 
@@ -79,18 +74,23 @@ public class SourceTypeInfo : SourceMemberInfo
         return GetConstructors().FirstOrDefault(x => x.Parameters.Select(p => p.ParameterType).SequenceEqual(types));
     }
 
-    private static IEnumerable<SourceTypeInfo> EnumerableInherit(SourceTypeInfo type)
+    private SourceTypeInfo[] GetThisAndAncestors()
     {
-        yield return type;
-        for (; ; )
-        {
-            if (type.BaseType == null)
-                break;
+        return _baseTypes ??= EnumerableInherit(this).ToArray();
 
-            type = SourceReflector.GetType(type.BaseType, type.IsReflected)!;
-            if (type == null)
-                break;
+        static IEnumerable<SourceTypeInfo> EnumerableInherit(SourceTypeInfo type)
+        {
             yield return type;
+            for (; ; )
+            {
+                if (type.BaseType == null)
+                    break;
+
+                type = SourceReflector.GetType(type.BaseType, type.IsReflected)!;
+                if (type == null)
+                    break;
+                yield return type;
+            }
         }
     }
 
