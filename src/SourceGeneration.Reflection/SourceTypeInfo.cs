@@ -48,8 +48,8 @@ public class SourceTypeInfo : SourceMemberInfo
 
     public SourcePropertyInfo[] GetProperties() => _properties ??= GetThisAndAncestors().Reverse().SelectMany(x => x.DeclaredProperties).ToArray();
     public SourceFieldInfo[] GetFields() => _fields ??= GetThisAndAncestors().Reverse().SelectMany(x => x.DeclaredFields).ToArray();
-    public SourceConstructorInfo[] GetConstructors() => _constructors ??= GetThisAndAncestors().Reverse().SelectMany(x => x.DeclaredConstructors).ToArray();
-    public SourceMethodInfo[] GetMethods() => _methods ??= GetThisAndAncestors().Reverse().SelectMany(x => x.DeclaredMethods).ToArray();
+    public SourceConstructorInfo[] GetConstructors() => _constructors ??= GetThisAndAncestors().SelectMany(x => x.DeclaredConstructors).ToArray();
+    public SourceMethodInfo[] GetMethods() => _methods ??= GetThisAndAncestors().SelectMany(x => x.DeclaredMethods).ToArray();
 
     public SourcePropertyInfo? GetProperty(string name) => GetProperties().FirstOrDefault(x => x.Name == name);
 
