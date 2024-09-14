@@ -43,6 +43,7 @@ public static class ReflectionExtensions
     }
 
     private static readonly Type IsExternalInitType = typeof(System.Runtime.CompilerServices.IsExternalInit);
+
     internal static bool IsInitOnly(this PropertyInfo propertyInfo)
     {
         MethodInfo? setMethod = propertyInfo.SetMethod;
@@ -80,4 +81,73 @@ public static class ReflectionExtensions
 
         return null;
     }
+
+    internal static bool IsCompatibleEnumerableGenericInterface(
+        this Type type,
+        out Type elementType)
+    {
+        var interfaceType = GetCompatibleGenericInterface(type, typeof(IEnumerable<>));
+        if (interfaceType == null)
+        {
+            elementType = null!;
+            return false;
+        }
+
+        elementType = interfaceType.GenericTypeArguments[0];
+        return true;
+    }
+
+    internal static bool IsCompatibleDictionaryGenericInterface(
+        this Type type, 
+        out Type keyType, 
+        out Type valueType)
+    {
+        var interfaceType = GetCompatibleGenericInterface(type, typeof(IDictionary<,>));
+        if (interfaceType == null)
+        {
+            keyType = null!;
+            valueType = null!;
+            return false;
+        }
+
+        keyType = interfaceType.GenericTypeArguments[0];
+        valueType = interfaceType.GenericTypeArguments[1];
+        return true;
+    }
+
+    private static Type? GetCompatibleGenericInterface(
+        this Type type, 
+        Type interfaceType)
+    {
+        //Debug.Assert(interfaceType.IsGenericType);
+        //Debug.Assert(interfaceType.IsInterface);
+        //Debug.Assert(interfaceType == interfaceType.GetGenericTypeDefinition());
+
+        Type interfaceToCheck = type;
+
+        if (interfaceToCheck.IsGenericType)
+        {
+            interfaceToCheck = interfaceToCheck.GetGenericTypeDefinition();
+        }
+
+        if (interfaceToCheck == interfaceType)
+        {
+            return type;
+        }
+
+        foreach (Type typeToCheck in type.GetInterfaces())
+        {
+            if (typeToCheck.IsGenericType)
+            {
+                Type genericInterfaceToCheck = typeToCheck.GetGenericTypeDefinition();
+                if (genericInterfaceToCheck == interfaceType)
+                {
+                    return typeToCheck;
+                }
+            }
+        }
+
+        return null;
+    }
+
 }
