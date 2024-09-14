@@ -15,6 +15,10 @@ internal class SourcePropertyInfo
     public bool CanRead;
     public bool IsIndexer;
     public bool IsInitOnly;
+
+    public bool IsGenericDictionaryType;
+    public bool IsGenericEnumerableType;
+
     public Accessibility Accessibility;
     public NullableAnnotation NullableAnnotation;
     public Accessibility GetMethodAccessibility;
