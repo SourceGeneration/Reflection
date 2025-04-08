@@ -1,6 +1,6 @@
 ﻿namespace System.Text;
 
-public class CSharpCodeBuilder
+internal class CSharpCodeBuilder
 {
     private const char IndentChar = ' ';
     private const int IndentLength = 4;
