@@ -41,10 +41,10 @@ SourceReflection aims to provide a more universal solution, offering `AOTable` R
 ## Installing Reflection
 
 ```powershell
-Install-Package SourceGeneration.Reflection -Version 1.0.0-beta2.241113.1
+Install-Package SourceGeneration.Reflection -Version 1.0.0-beta2.250410.1
 ```
 ```powershell
-dotnet add package SourceGeneration.Reflection --version 1.0.0-beta2.241113.1
+dotnet add package SourceGeneration.Reflection --version 1.0.0-beta2.250410.1
 ```
 
 ## Source Reflection
@@ -462,7 +462,6 @@ You don't need to worry about whether the user has marked an object with the `So
 - [Basic](https://github.com/SourceGeneration/Reflection/tree/main/samples/Basic) example demonstrates some basic uses of SourceReflection.
 
 - [Sytem.Text.Json Adapter](https://github.com/SourceGeneration/Reflection/tree/main/samples/SystemTextJson) example demonstrates how to uses `SourceReflection` for JsonSerializer .
-
 
 - [CsvExporter](https://github.com/SourceGeneration/Reflection/tree/main/samples/CsvWriter) is a csv file export sample.
 
