@@ -11,6 +11,11 @@ public class SourceTypeInfo : SourceMemberInfo
     private SourcePropertyInfo[]? _properties;
     private SourceConstructorInfo[]? _constructors;
 
+    private SourceFieldInfo[]? _declaredFields;
+    private SourceMethodInfo[]? _declaredMethods;
+    private SourcePropertyInfo[]? _declaredProperties;
+    private SourceConstructorInfo[]? _declaredConstructors;
+
     public SourceAccessibility Accessibility { get; init; }
 
 #if NET5_0_OR_GREATER
@@ -38,11 +43,15 @@ public class SourceTypeInfo : SourceMemberInfo
     public bool IsReadOnly { get; init; }
     public bool IsReflected { get; init; }
 
+    [EditorBrowsable(EditorBrowsableState.Never)] public Func<SourcePropertyInfo[]> DeclaredPropertiesInitializer { get; init; } = default!;
+    [EditorBrowsable(EditorBrowsableState.Never)] public Func<SourceMethodInfo[]> DeclaredMethodsInitializer { get; init; } = default!;
+    [EditorBrowsable(EditorBrowsableState.Never)] public Func<SourceConstructorInfo[]> DeclaredConstructorsInitializer { get; init; } = default!;
+    [EditorBrowsable(EditorBrowsableState.Never)] public Func<SourceFieldInfo[]> DeclaredFieldsInitializer { get; init; } = default!;
 
-    public SourcePropertyInfo[] DeclaredProperties { get; init; } = default!;
-    public SourceMethodInfo[] DeclaredMethods { get; init; } = default!;
-    public SourceConstructorInfo[] DeclaredConstructors { get; init; } = default!;
-    public SourceFieldInfo[] DeclaredFields { get; init; } = default!;
+    public SourcePropertyInfo[] DeclaredProperties => _declaredProperties ??= DeclaredPropertiesInitializer();
+    public SourceMethodInfo[] DeclaredMethods => _declaredMethods ??= DeclaredMethodsInitializer();
+    public SourceConstructorInfo[] DeclaredConstructors => _declaredConstructors ??= DeclaredConstructorsInitializer();
+    public SourceFieldInfo[] DeclaredFields => _declaredFields ??= DeclaredFieldsInitializer();
 
     public SourceTypeInfo MarkArrayType() => SourceReflector.GetRequiredType(ArrayType, true);
 

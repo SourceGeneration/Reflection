@@ -139,14 +139,14 @@ public static class SourceReflector
             IsStatic = type.IsAbstract && type.IsSealed,
 
             IsReflected = true,
-            DeclaredConstructors = type.GetConstructors(ReflectionExtensions.DeclaredOnlyLookup).Select(static x => new SourceConstructorInfo(() => x)
+            DeclaredConstructorsInitializer = () => type.GetConstructors(ReflectionExtensions.DeclaredOnlyLookup).Select(static x => new SourceConstructorInfo(() => x)
             {
                 Name = ".ctor",
                 Accessibility = x.GetAccessibility(),
                 IsStatic = x.IsStatic,
                 Parameters = CreateParameterInfos(x.GetParameters()),
             }).ToArray(),
-            DeclaredMethods = type.GetMethods(ReflectionExtensions.DeclaredOnlyLookup).Select(static x => new SourceMethodInfo(() => x)
+            DeclaredMethodsInitializer = () => type.GetMethods(ReflectionExtensions.DeclaredOnlyLookup).Select(static x => new SourceMethodInfo(() => x)
             {
                 Name = x.Name,
                 Accessibility = x.GetAccessibility(),
@@ -155,7 +155,7 @@ public static class SourceReflector
                 ReturnNullableAnnotation = x.GetCustomAttribute<System.Runtime.CompilerServices.NullableAttribute>() == null ? SourceNullableAnnotation.None : SourceNullableAnnotation.Annotated,
                 Parameters = CreateParameterInfos(x.GetParameters()),
             }).ToArray(),
-            DeclaredFields = type.GetFields(ReflectionExtensions.DeclaredOnlyLookup).Select(static x => new SourceFieldInfo(() => x)
+            DeclaredFieldsInitializer = () => type.GetFields(ReflectionExtensions.DeclaredOnlyLookup).Select(static x => new SourceFieldInfo(() => x)
             {
                 Name = x.Name,
                 Accessibility = x.GetAccessibility(),
@@ -165,7 +165,7 @@ public static class SourceReflector
                 IsRequired = x.GetCustomAttribute<System.Runtime.CompilerServices.RequiredMemberAttribute>() != null,
                 NullableAnnotation = x.GetCustomAttribute<System.Runtime.CompilerServices.NullableAttribute>() == null ? SourceNullableAnnotation.None : SourceNullableAnnotation.Annotated,
             }).ToArray(),
-            DeclaredProperties = type.GetProperties(ReflectionExtensions.DeclaredOnlyLookup).Select(static x =>
+            DeclaredPropertiesInitializer = () => type.GetProperties(ReflectionExtensions.DeclaredOnlyLookup).Select(static x =>
             {
                 var parameters = x.GetIndexParameters();
                 return new SourcePropertyInfo(() => x)

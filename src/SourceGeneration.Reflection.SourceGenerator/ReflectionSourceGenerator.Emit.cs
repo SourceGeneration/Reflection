@@ -78,7 +78,7 @@ public partial class ReflectionSourceGenerator
 
                 if (type.Fields.Count > 0)
                 {
-                    builder.AppendBlock("DeclaredFields = new global::SourceGeneration.Reflection.SourceFieldInfo[]", () =>
+                    builder.AppendBlock("DeclaredFieldsInitializer = static () => new global::SourceGeneration.Reflection.SourceFieldInfo[]", () =>
                     {
                         foreach (var field in type.Fields)
                         {
@@ -90,12 +90,12 @@ public partial class ReflectionSourceGenerator
                 }
                 else
                 {
-                    builder.AppendLine("DeclaredFields = global::System.Array.Empty<global::SourceGeneration.Reflection.SourceFieldInfo>(),");
+                    builder.AppendLine("DeclaredFieldsInitializer = static () => global::System.Array.Empty<global::SourceGeneration.Reflection.SourceFieldInfo>(),");
                 }
 
                 if (type.Properties.Count > 0)
                 {
-                    builder.AppendBlock("DeclaredProperties = new global::SourceGeneration.Reflection.SourcePropertyInfo[]", () =>
+                    builder.AppendBlock("DeclaredPropertiesInitializer = static () => new global::SourceGeneration.Reflection.SourcePropertyInfo[]", () =>
                     {
                         foreach (var property in type.Properties)
                         {
@@ -107,12 +107,12 @@ public partial class ReflectionSourceGenerator
                 }
                 else
                 {
-                    builder.AppendLine("DeclaredProperties = global::System.Array.Empty<global::SourceGeneration.Reflection.SourcePropertyInfo>(),");
+                    builder.AppendLine("DeclaredPropertiesInitializer = static () => global::System.Array.Empty<global::SourceGeneration.Reflection.SourcePropertyInfo>(),");
                 }
 
                 if (type.Methods.Count > 0)
                 {
-                    builder.AppendBlock("DeclaredMethods = new global::SourceGeneration.Reflection.SourceMethodInfo[]", () =>
+                    builder.AppendBlock("DeclaredMethodsInitializer = static () => new global::SourceGeneration.Reflection.SourceMethodInfo[]", () =>
                     {
                         foreach (var method in type.Methods)
                         {
@@ -124,12 +124,12 @@ public partial class ReflectionSourceGenerator
                 }
                 else
                 {
-                    builder.AppendLine("DeclaredMethods = global::System.Array.Empty<global::SourceGeneration.Reflection.SourceMethodInfo>(),");
+                    builder.AppendLine("DeclaredMethodsInitializer = static () => global::System.Array.Empty<global::SourceGeneration.Reflection.SourceMethodInfo>(),");
                 }
 
                 if (type.Constructors.Count > 0)
                 {
-                    builder.AppendBlock("DeclaredConstructors = new global::SourceGeneration.Reflection.SourceConstructorInfo[]", () =>
+                    builder.AppendBlock("DeclaredConstructorsInitializer = static () => new global::SourceGeneration.Reflection.SourceConstructorInfo[]", () =>
                     {
                         foreach (var constructor in type.Constructors)
                         {
@@ -141,7 +141,7 @@ public partial class ReflectionSourceGenerator
                 }
                 else
                 {
-                    builder.AppendLine("DeclaredConstructors = global::System.Array.Empty<global::SourceGeneration.Reflection.SourceConstructorInfo>(),");
+                    builder.AppendLine("DeclaredConstructorsInitializer = static () => global::System.Array.Empty<global::SourceGeneration.Reflection.SourceConstructorInfo>(),");
                 }
             }, ";");
         });
