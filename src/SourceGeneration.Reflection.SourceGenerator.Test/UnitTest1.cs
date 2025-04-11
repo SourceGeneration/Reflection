@@ -18,20 +18,9 @@ using SourceGeneration.Reflection;
 
 namespace SourceGeneration.Reflection.Sample2
 {
-[SourceReflection]
-public class InterfaceImplementTestObject : System.ICloneable, System.IComparable
-{
-    public  string Dic;
-    public int CompareTo(object? obj)
-    {
-        throw new NotImplementedException();
-    }
-
-    object System.ICloneable.Clone()
-    {
-        throw new NotImplementedException();
-    }
-}}
+public class BaseObject { }
+[SourceReflection] public class InheritedObject1 : BaseObject { }
+[SourceReflection] public class InheritedObject2 : BaseObject { }
 ";
         var result = CSharpTestGenerator.Generate<ReflectionSourceGenerator>(source, typeof(SourceReflectionAttribute).Assembly, typeof(UnitTest1).Assembly);
         var script = result.RunResult.GeneratedTrees.FirstOrDefault()?.GetText();
