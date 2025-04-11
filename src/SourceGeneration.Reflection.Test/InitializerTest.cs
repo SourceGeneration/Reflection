@@ -13,10 +13,10 @@ public class InitializerTest
     [TestMethod]
     public void Test()
     {
-        Stopwatch sw = new();
-        sw.Start();
+        //Stopwatch sw = new();
+        //sw.Start();
 
-        __SourceReflectorInitializer.Initialize();
-        sw.Stop();
+        //__SourceReflectorInitializer.Initialize();
+        //sw.Stop();
     }
 }
