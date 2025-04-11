@@ -7,7 +7,7 @@
 		<LangVersion>12</LangVersion>
 		<SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
 
-		<Version>1.0.0-beta2.250410.1</Version>
+		<Version>1.0.0-beta2.250411.1</Version>
 
 		<Authors>SourceGeneration</Authors>
 		<Description>Reflection based on Source Generator supports AOT compilation</Description>
