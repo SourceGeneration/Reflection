@@ -43,7 +43,10 @@ public partial class ReflectionSourceGenerator
 
             if (typeSymbol.BaseType != null && typeSymbol.BaseType.ContainingAssembly.Equals(assemblySymbol, SymbolEqualityComparer.Default) && !typeSymbols.Contains(typeSymbol.BaseType, SymbolEqualityComparer.Default))
             {
-                queue.Enqueue(typeSymbol.BaseType);
+                if (!queue.Contains(typeSymbol.BaseType))
+                {
+                    queue.Enqueue(typeSymbol.BaseType);
+                }
             }
         }
     }
