@@ -188,6 +188,7 @@ public partial class ReflectionSourceGenerator
                 {
                     Name = x.Name,
                     HasUnmanagedTypeConstraint = x.HasUnmanagedTypeConstraint,
+                    HasValueTypeConstraint = x.HasValueTypeConstraint,
                     HasTypeParameterInConstraintTypes = x.ConstraintTypes.Any(x => x.HasTypeParameter()),
                     ConstraintTypes = x.ConstraintTypes.Select(x => x.ToDisplayString(GlobalTypeDisplayFormat)).ToArray(),
                 }).ToArray(),
