@@ -53,7 +53,7 @@ public class SourceTypeInfo : SourceMemberInfo
     public SourceConstructorInfo[] DeclaredConstructors => _declaredConstructors ??= DeclaredConstructorsInitializer();
     public SourceFieldInfo[] DeclaredFields => _declaredFields ??= DeclaredFieldsInitializer();
 
-    public SourceTypeInfo MarkArrayType() => SourceReflector.GetRequiredType(ArrayType, true);
+    public SourceTypeInfo MakeArrayType() => SourceReflector.GetRequiredType(ArrayType, true);
 
     public SourcePropertyInfo[] GetProperties() => _properties ??= GetThisAndAncestors().Reverse().SelectMany(x => x.DeclaredProperties).ToArray();
     public SourceFieldInfo[] GetFields() => _fields ??= GetThisAndAncestors().Reverse().SelectMany(x => x.DeclaredFields).ToArray();
