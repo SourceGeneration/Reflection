@@ -35,7 +35,7 @@ SourceReflection aims to provide a more universal solution, offering `AOTable` R
 
 > Similar to generic types, there are also generic methods. The issue lies in `MakeGenericMethod`. However, it can currently handle some specific cases, such as situations where the generic type can be inferred.
 
-`.NET 9` has made significant improvements to AOT and can support `MakeGenericType` and `MakeGenericMethod`. However, there is still a significant amount of work to be done in SourceReflection. Support will be added in subsequent versions
+`.NET9.0` has made significant improvements to AOT and can support `MakeGenericType` and `MakeGenericMethod`. However, there is still a significant amount of work to be done in SourceReflection. Support will be added in subsequent versions
 
 **Adapters**
 - `System.Text.Json` Adapter, supports `AOT` without JsonSerializerContext
