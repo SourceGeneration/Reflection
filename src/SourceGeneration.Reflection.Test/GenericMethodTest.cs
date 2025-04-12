@@ -69,6 +69,44 @@ public class GenericMethodTest
     }
 
     [TestMethod]
+    public void StructConstraint()
+    {
+        SourceTypeInfo type = SourceReflector.GetRequiredType<GenericMethodTestObject>();
+
+        var method = type.GetMethod("InvokeStructConstraint")!;
+
+        GenericMethodTestObject instance = new();
+
+        Assert.ThrowsException<InvalidOperationException>(() =>
+        {
+            Assert.AreEqual(1, method.Invoke(instance, [1]));
+        });
+
+        var value = method.MethodInfo.MakeGenericMethod(typeof(int)).Invoke(instance, [1]);
+        Assert.AreEqual(1, value);
+    }
+
+    [TestMethod]
+    public void EnumConstraint()
+    {
+        SourceTypeInfo type = SourceReflector.GetRequiredType<GenericMethodTestObject>();
+
+        var method = type.GetMethod("InvokeEnumConstraint")!;
+
+        GenericMethodTestObject instance = new();
+
+        
+        var aa = method.Invoke(instance, [EnumTestObject.B]);
+
+        Assert.AreEqual(EnumTestObject.A, method.Invoke(instance, [EnumTestObject.A]));
+        Assert.AreEqual(EnumTestObject.B, method.Invoke(instance, [EnumTestObject.B]));
+        Assert.ThrowsException<InvalidCastException>(() =>
+        {
+            Assert.AreEqual("abc", method.Invoke(instance, ["abc"]));
+        });
+    }
+
+    [TestMethod]
     public void DoubleInternfaceConstraint()
     {
         SourceTypeInfo type = SourceReflector.GetRequiredType<GenericMethodTestObject>();
@@ -86,7 +124,6 @@ public class GenericMethodTest
             Assert.AreEqual("abc", method.Invoke(instance, ["abc"]));
         });
     }
-
 
     [TestMethod]
     public void DoubleTypeParameter()
@@ -138,6 +175,10 @@ public class GenericMethodTestObject
     public T Invoke5<T>(T t) where T : ICloneable, IComparable => t;
     public T Invoke6<T, K>(T t, K k) where T : ICloneable where K : IComparable => t;
     public T[] InvokeArray1<T>(T[] t) => t;
+
+    public T InvokeStructConstraint<T>(T t) where T: struct => t;
+    public T InvokeEnumConstraint<T>(T t) where T : Enum => t;
+
 }
 
 
