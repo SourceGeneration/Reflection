@@ -43,10 +43,10 @@ SourceReflection aims to provide a more universal solution, offering `AOTable` R
 ## Installing Reflection
 
 ```powershell
-Install-Package SourceGeneration.Reflection -Version 1.0.0-beta2.250411.1
+Install-Package SourceGeneration.Reflection -Version 1.0.0-beta2.250412.0
 ```
 ```powershell
-dotnet add package SourceGeneration.Reflection --version 1.0.0-beta2.250411.1
+dotnet add package SourceGeneration.Reflection --version 1.0.0-beta2.250412.0
 ```
 
 ## Source Reflection
