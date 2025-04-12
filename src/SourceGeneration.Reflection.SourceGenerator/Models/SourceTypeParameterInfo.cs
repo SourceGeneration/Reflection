@@ -6,7 +6,6 @@ internal class SourceTypeParameterInfo
 
     public bool HasUnmanagedTypeConstraint;
     public bool HasValueTypeConstraint;
-
     public bool HasTypeParameterInConstraintTypes;
     public string[] ConstraintTypes;
 }

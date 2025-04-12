@@ -31,9 +31,11 @@ SourceReflection aims to provide a more universal solution, offering `AOTable` R
 - Generic type definition
 - Generic method *
 
-> Currently, support for generic type definition is not yet available. The main issue lies in the handling of `MarkGenericType`. I am currently experimenting with more effective approaches, but there is no specific plan at the moment.
+> Currently, support for generic type definition is not yet available. The main issue lies in the handling of `MakeGenericType`.
 
-> Similar to generic types, there are also generic methods. The issue lies in `MarkGenericMethod`. However, it can currently handle some specific cases, such as situations where the generic type can be inferred.
+> Similar to generic types, there are also generic methods. The issue lies in `MakeGenericMethod`. However, it can currently handle some specific cases, such as situations where the generic type can be inferred.
+
+`.NET 9` has made significant improvements to AOT and can support `MakeGenericType` and `MakeGenericMethod`. However, there is still a significant amount of work to be done in SourceReflection. Support will be added in subsequent versions
 
 **Adapters**
 - `System.Text.Json` Adapter, supports `AOT` without JsonSerializerContext
@@ -125,13 +127,13 @@ Assert.AreEqual(1, type.DeclaredFields[1].GetValue(null));
 
 ## Array
 
-The usage of `MarkArrayType` is similar to that of Runtime reflection.
+The usage of `MakeArrayType` is similar to that of Runtime reflection.
 
 ```c#
 [assembly: SourceReflectionType(typeof(int))]
 
 SourceTypeInfo type = SourceReflector.GetType<int>();
-SourceTypeInfo arrayType = type.MarkArrayType();
+SourceTypeInfo arrayType = type.MakeArrayType();
 
 int[] array = [1, 2];
 Assert.AreEqual(2, arrayType.GetRequriedProperty("Length").GetValue(array));
@@ -235,7 +237,7 @@ var o6 = SourceReflector.CreateInstance(typeof(CreateInstanceTestObject), 1, 2, 
 
 ## Generic Definition
 
-Currently, support for generic type definition is not yet available. The main issue lies in the handling of `MarkGenericType`. I am currently experimenting with more effective approaches, but there is no specific plan at the moment.
+Currently, support for generic type definition is not yet available. The main issue lies in the handling of `MakeGenericType`. I am currently experimenting with more effective approaches, but there is no specific plan at the moment.
 
 ```c#
 [assembly: SourceReflectionType(typeof(List<>))]
@@ -252,7 +254,7 @@ Assert.IsNull(SourceReflector.GetType<GenericTypeDefinitionTestObject<>>());
 
 ## Generic Type
 
-Currently, support for generic type definition is not yet available. The main issue lies in the handling of `MarkGenericType`. The source generation can handle handle known types.
+Currently, support for generic type definition is not yet available. The main issue lies in the handling of `MakeGenericType`. The source generation can handle handle known types.
 
 ```c#
 [assembly: SourceReflectionType(typeof(List<string>))]
@@ -265,19 +267,30 @@ Assert.AreEqual(3, type.GetProperty("Count")!.GetValue(list));
 
 ## Generic Method
 
-For generic methods with inferable types, they can be called using source generation
+If the parameter type can be inferred and cast to the constraint type, they can be called using source generation
 
 ```c#
 [SourceReflection]
 public class GenericMethodTestObject
 {
+    //can't work (can not infer type parameter)
     public T Invoke0<T>() => default!;
+
     public T Invoke1<T>(T t) => t;
     public T Invoke2<T>(T t) where T : ICloneable => t;
-    public T Invoke3<T>(T t) where T : unmanaged => t;
-    public T Invoke4<T>(T t) where T : notnull => t;
-    public T Invoke5<T>(T t) where T : ICloneable, IComparable => t;
-    public T Invoke6<T, K>(T t, K k) where T : ICloneable where K : IComparable => t;
+    public T Invoke3<T>(T t) where T : notnull => t;
+    public T Invoke4<T>(T t) where T : Enum => t;
+
+    //can't work (Unable to infer type. unable to cast object to unmanaged object)
+    public T Invoke5<T>(T t) where T : unmanaged => t;
+
+    //can't work (Unable to infer type. unable to cast object to struct)
+    public T Invoke6<T>(T t) where T : struct => t;
+
+    public T Invoke7<T>(T t) where T : ICloneable, IComparable => t;
+    public T Invoke8<T, K>(T t, K k) where T : ICloneable where K : IComparable => t;
+
+    //can't work (Unable to infer type. unable to cast object to T[])
     public T[] InvokeArray1<T>(T[] t) => t;
 }
 ```
@@ -289,23 +302,25 @@ GenericMethodTestObject instance = new();
 // Success
 type.GetMethod("Invoke1").Invoke(instance, [1]);
 type.GetMethod("Invoke2").Invoke(instance, [1]);
-type.GetMethod("Invoke4").Invoke(instance, [1]);
-type.GetMethod("Invoke5").Invoke(instance, [1]);
-type.GetMethod("Invoke6").Invoke(instance, [1, 2]);
-
-//Error
-type.GetMethod("Invoke0").Invoke(instance, []);
 type.GetMethod("Invoke3").Invoke(instance, [1]);
+type.GetMethod("Invoke4").Invoke(instance, [Gender.Male]);
+type.GetMethod("Invoke7").Invoke(instance, [1]);
+type.GetMethod("Invoke8").Invoke(instance, [1, 2]);
+
+//Error (can not infer type parameter)
+type.GetMethod("Invoke0").Invoke(instance, []);
+type.GetMethod("Invoke5").Invoke(instance, [1]);
+type.GetMethod("Invoke6").Invoke(instance, [1]);
 type.GetMethod("InvokeArray1").Invoke(instance, [new int[] { 1 }]);
 ```
 
-When the generic type cannot be inferred, the only option is to use runtime reflection through `MarkGenericMethod`, which will not be supported in AOT compilation.
+When the parameter type can be inferred and cast to the constraint type, the only option is to use runtime reflection through `MakeGenericMethod`, which will not be supported in AOT compilation.
 
 ```c#
-type.GetMethod("Invoke0").MethodInfo.MarkGenericMethod([]).Invoke(instance);
+type.GetMethod("Invoke0").MethodInfo.MakeGenericMethod([]).Invoke(instance);
 ```
 
-Even if the type can be inferred, this approach has its drawbacks. If the internal implementation of the method has type checks on the generic parameters, the result may not meet expectations.
+Even if the type can be inferred and can be explicitly cast to a constrained type, this approach has its drawbacks. If the internal implementation of the method has type checks on the generic parameters, the result may not meet expectations.
 
 ```c#
 public class GenericMethodTestObject

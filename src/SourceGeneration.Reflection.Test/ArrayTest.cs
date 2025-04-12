@@ -7,7 +7,7 @@ public class ArrayTest
     public void Test()
     {
         var type = SourceReflector.GetRequiredType<int>();
-        var arrayType = type.MarkArrayType();
+        var arrayType = type.MakeArrayType();
 
         int[] array = [1, 2];
         Assert.AreEqual(2, arrayType.GetRequriedProperty("Length").GetValue(array));
