@@ -25,7 +25,7 @@ public class SourceMethodInfo(Func<MethodInfo> getMethodInfo) : SourceMethodBase
 
     public Func<object?, object?[]?, object?> Invoke
     {
-        get => _invoke ?? MethodInfo.Invoke;
+        get => _invoke ?? (MethodInfo.IsGenericMethodDefinition ? throw new InvalidOperationException("This method has a generic parameter. Please use MethodInfo.Invoke instead.") : MethodInfo.Invoke);
         init => _invoke = value;
     }
 }
