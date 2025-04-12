@@ -24,7 +24,7 @@ internal class SourceMethodInfo : SourceMethodBase
 
         if (IsGenericMethod)
         {
-            if (TypeParameters.Any(x => x.HasUnmanagedTypeConstraint || x.HasTypeParameterInConstraintTypes || x.ConstraintTypes.Length > 1))
+            if (TypeParameters.Any(x => x.HasUnmanagedTypeConstraint || x.HasValueTypeConstraint || x.HasTypeParameterInConstraintTypes || x.ConstraintTypes.Length > 1))
                 return false;
 
             if (Parameters.Any(x => !x.IsTypeParameter && x.HasNestedTypeParameter))
