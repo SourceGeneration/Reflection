@@ -24,4 +24,6 @@ internal class SourcePropertyInfo
     public Accessibility GetMethodAccessibility;
     public Accessibility SetMethodAccessibility;
     public List<SourceParameterInfo> Parameters = [];
+
+    public string DefaultValueExpression;
 }
