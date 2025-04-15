@@ -1,6 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace SourceGeneration.Reflection.SourceGenerator;
 
@@ -95,6 +97,34 @@ internal static class TypeSymbolExtensions
             return true;
 
         return type.AllInterfaces.Any(x => x.IsGenericType && x.Name == "IEnumerable");
+    }
+
+    public static string GetInitializeValue(this IFieldSymbol field, CancellationToken cancellationToken)
+    {
+        if (field.DeclaringSyntaxReferences.Length > 0)
+        {
+            var syntax = field.DeclaringSyntaxReferences[0].GetSyntax(cancellationToken);
+            if (syntax is VariableDeclaratorSyntax declaration &&
+                declaration.Initializer is EqualsValueClauseSyntax equalsValueClause)
+            {
+                return equalsValueClause.Value.ToFullString();
+            }
+        }
+        return null;
+    }
+
+    public static string GetInitializeValue(this IPropertySymbol property, CancellationToken cancellationToken)
+    {
+        if (property.DeclaringSyntaxReferences.Length > 0)
+        {
+            var syntax = property.DeclaringSyntaxReferences[0].GetSyntax(cancellationToken);
+            if (syntax is PropertyDeclarationSyntax declaration &&
+                declaration.Initializer is EqualsValueClauseSyntax equalsValueClause)
+            {
+                return equalsValueClause.Value.ToFullString();
+            }
+        }
+        return null;
     }
 
 }
