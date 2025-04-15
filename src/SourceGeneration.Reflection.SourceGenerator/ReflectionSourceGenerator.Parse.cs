@@ -70,7 +70,7 @@ public partial class ReflectionSourceGenerator
         foreach (var field in typeSymbol.GetMembers().OfType<IFieldSymbol>())
         {
             cancellationToken.ThrowIfCancellationRequested();
-            typeInfo.Fields.Add(CreateField(field, cancellationToken));
+            typeInfo.Fields.Add(CreateField(field));
         }
 
         return typeInfo;
@@ -143,13 +143,13 @@ public partial class ReflectionSourceGenerator
         foreach (var field in members.OfType<IFieldSymbol>())
         {
             cancellationToken.ThrowIfCancellationRequested();
-            typeInfo.Fields.Add(CreateField(field, cancellationToken));
+            typeInfo.Fields.Add(CreateField(field));
         }
 
         foreach (var property in members.OfType<IPropertySymbol>())
         {
             cancellationToken.ThrowIfCancellationRequested();
-            typeInfo.Properties.Add(CreateProperty(property, cancellationToken));
+            typeInfo.Properties.Add(CreateProperty(property));
         }
 
         foreach (var constructor in typeSymbol.Constructors)
@@ -227,7 +227,7 @@ public partial class ReflectionSourceGenerator
         };
     }
 
-    private static SourcePropertyInfo CreateProperty(IPropertySymbol property, CancellationToken cancellationToken)
+    private static SourcePropertyInfo CreateProperty(IPropertySymbol property)
     {
         //string defaultValueExpression = property.IsRequired ? property.GetInitializeValue(cancellationToken) :null;
 
@@ -265,7 +265,7 @@ public partial class ReflectionSourceGenerator
         };
     }
 
-    private static SourceFieldInfo CreateField(IFieldSymbol field, CancellationToken cancellationToken)
+    private static SourceFieldInfo CreateField(IFieldSymbol field)
     {
         //string defaultValueExpression = field.IsRequired ? field.GetInitializeValue(cancellationToken) : null;
 

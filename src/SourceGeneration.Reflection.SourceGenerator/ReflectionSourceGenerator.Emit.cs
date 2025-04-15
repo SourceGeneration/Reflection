@@ -1,5 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +6,7 @@ using System.Threading;
 
 namespace SourceGeneration.Reflection;
 
+#pragma warning disable IDE0305
 public partial class ReflectionSourceGenerator
 {
     private static void Emit(SourceProductionContext context, List<SourceTypeInfo> types, CancellationToken cancellationToken)
