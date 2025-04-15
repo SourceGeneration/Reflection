@@ -43,10 +43,10 @@ SourceReflection aims to provide a more universal solution, offering `AOTable` R
 ## Installing Reflection
 
 ```powershell
-Install-Package SourceGeneration.Reflection -Version 1.0.0-beta2.250412.0
+Install-Package SourceGeneration.Reflection -Version 1.0.0-beta2.250415.0
 ```
 ```powershell
-dotnet add package SourceGeneration.Reflection --version 1.0.0-beta2.250412.0
+dotnet add package SourceGeneration.Reflection --version 1.0.0-beta2.250415.0
 ```
 
 ## Source Reflection
@@ -199,12 +199,50 @@ Assert.IsTrue(type.GetProperty("Field").IsRequired);
 [SourceReflection]
 public class InitOnlyPropertyTestObject
 {
-    public required int Property { get; init; }
+    public int Property { get; init; }
 }
 ```
 ```c#
 var type = SourceReflector.GetType(typeof(InitOnlyPropertyTestObject));
 Assert.IsTrue(type.GetProperty("Property").IsInitOnly);
+```
+
+## GenericEnumerableType Property
+```c#
+[SourceReflection]
+public class EnumerablePropertyTestObject
+{
+    public IEnumerable<string> Enumerable { get; init; }
+    public List<string> List { get; init; }
+    public CustomList CustomList { get; init; }
+}
+
+public class CustomList : IList<int> { }
+```
+```c#
+var type = SourceReflector.GetType(typeof(EnumerablePropertyTestObject));
+Assert.IsTrue(type.GetProperty("Enumerable").IsGenericEnumerableType);
+Assert.IsTrue(type.GetProperty("List").IsGenericEnumerableType);
+Assert.IsTrue(type.GetProperty("CustomList").IsGenericEnumerableType);
+```
+
+## GenericDictionaryType Property
+```c#
+[SourceReflection]
+public class DictionaryPropertyTestObject
+{
+    public IDictionary<string,string> Dictionary { get; init; }
+    public SortedDictionary<string,string> SortedDictionary { get; init; }
+    public CustomDictionary CustomDictionary { get; init; }
+}
+
+public class CustomDictionary : IDictionary<int,object> { }
+```
+```c#
+var type = SourceReflector.GetType(typeof(DictionaryPropertyTestObject));
+Assert.IsTrue(type.GetProperty("Dictionary").IsGenericDictionaryType);
+Assert.IsTrue(type.GetProperty("SortedDictionary").IsGenericDictionaryType);
+Assert.IsTrue(type.GetProperty("CustomDictionary").IsGenericDictionaryType);
 ```
 
 ## Create Instance
