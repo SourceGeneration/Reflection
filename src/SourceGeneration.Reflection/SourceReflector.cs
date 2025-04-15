@@ -4,6 +4,8 @@ using System.Reflection;
 
 namespace SourceGeneration.Reflection;
 
+#pragma warning disable IDE0305
+
 public static class SourceReflector
 {
     private static readonly Dictionary<Type, SourceTypeInfo> _types = [];
@@ -12,8 +14,12 @@ public static class SourceReflector
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static void Add(SourceTypeInfo typeInfo)
     {
+#if NET5_0_OR_GREATER
+        _types.TryAdd(typeInfo.Type, typeInfo);
+#else
         if (!_types.ContainsKey(typeInfo.Type))
             _types.Add(typeInfo.Type, typeInfo);
+#endif
     }
 
     public static T CreateInstance<
