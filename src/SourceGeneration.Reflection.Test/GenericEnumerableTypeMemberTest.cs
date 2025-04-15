@@ -14,6 +14,7 @@ public class GenericEnumerableTypeMemberTest
         Assert.IsFalse(typeInfo.GetFieldOrProperty(nameof(GenericEnumerableMemberType.Int))!.IsGenericEnumerableType);
         Assert.IsFalse(typeInfo.GetFieldOrProperty(nameof(GenericEnumerableMemberType.Object))!.IsGenericEnumerableType);
         Assert.IsFalse(typeInfo.GetFieldOrProperty(nameof(GenericEnumerableMemberType.NonGenericEnumerableInterface))!.IsGenericEnumerableType);
+        Assert.IsTrue(typeInfo.GetFieldOrProperty(nameof(GenericEnumerableMemberType.String))!.IsGenericEnumerableType);
 
         Assert.IsTrue(typeInfo.GetFieldOrProperty(nameof(GenericEnumerableMemberType.EnumerableInterface))!.IsGenericEnumerableType);
         Assert.IsTrue(typeInfo.GetFieldOrProperty(nameof(GenericEnumerableMemberType.ListInterface))!.IsGenericEnumerableType);
@@ -38,6 +39,7 @@ public class GenericEnumerableMemberType
 {
     public object? Object { get; set; }
     public int Int { get; set; }
+    public string? String { get; set; }
     public IEnumerable<string>? EnumerableInterface { get; set; }
     public IList<string>? ListInterface { get; set; }
     public List<string>? List { get; set; }
