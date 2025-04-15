@@ -16,6 +16,8 @@ public interface ISourceFieldOrPropertyInfo
 
     bool IsStatic { get; }
     bool IsRequired { get; }
+    bool IsGenericDictionaryType { get; }
+    bool IsGenericEnumerableType { get; }
 
     Func<object?, object?> GetValue { get; }
     Action<object?, object?> SetValue { get; }
