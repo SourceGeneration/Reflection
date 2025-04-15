@@ -20,6 +20,10 @@ public class SourceFieldInfo(Func<FieldInfo> fieldInfoAccess) : SourceMemberInfo
     public bool IsStatic { get; init; }
     public bool IsReadOnly { get; init; }
     public bool IsConst { get; init; }
+
+    public bool IsGenericDictionaryType { get; init; }
+    public bool IsGenericEnumerableType { get; init; }
+
     public SourceNullableAnnotation NullableAnnotation { get; init; }
 
     public Func<object?, object?> GetValue

@@ -27,6 +27,9 @@ public class SourcePropertyInfo(Func<PropertyInfo> propertyInfoAccess) : SourceM
     public bool IsStatic { get; init; }
     public bool IsInitOnly { get; init; }
     public bool IsIndexer { get; init; }
+    public bool IsGenericDictionaryType { get; init; }
+    public bool IsGenericEnumerableType { get; init; }
+
     public SourceParameterInfo[] IndexerParameters { get; init; } = [];
 
     public SourceNullableAnnotation NullableAnnotation { get; init; }
