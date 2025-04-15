@@ -16,5 +16,5 @@ internal class SourceFieldInfo
     public Accessibility Accessibility;
     public NullableAnnotation NullableAnnotation;
 
-    public string DefaultValueExpression;
+    //public string DefaultValueExpression;
 }
