@@ -24,6 +24,10 @@ internal class SourceTypeInfo
     public readonly List<SourceMethodInfo> Methods = [];
     public readonly List<SourceConstructorInfo> Constructors = [];
 
+    //public Dictionary<string,string> BaseRequiredMembers = [];
+
+    public bool HasBaseRequiredMembers;
+
     public bool IsEnum;
     public string EnumUnderlyingType;
 }
