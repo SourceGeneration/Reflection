@@ -165,6 +165,8 @@ public partial class ReflectionSourceGenerator
             builder.AppendAssignment("IsRequired", field.IsRequired);
             builder.AppendAssignment("IsReadOnly", field.IsReadOnly);
             builder.AppendAssignment("IsConst", field.IsConst);
+            builder.AppendAssignment("IsGenericDictionaryType", field.IsGenericDictionaryType);
+            builder.AppendAssignment("IsGenericEnumerableType", field.IsGenericEnumerableType);
 
             if (!type.IsGenericTypeDefinition &&
                 !type.IsRefLikeType &&
@@ -219,6 +221,8 @@ public partial class ReflectionSourceGenerator
             builder.AppendAssignment("IsAbstract", property.IsAbstract);
             builder.AppendAssignment("IsInitOnly", property.IsInitOnly);
             builder.AppendAssignment("IsIndexer", property.IsIndexer);
+            builder.AppendAssignment("IsGenericDictionaryType", property.IsGenericDictionaryType);
+            builder.AppendAssignment("IsGenericEnumerableType", property.IsGenericEnumerableType);
 
             builder.AppendAssignment("CanWrite", property.CanWrite);
             builder.AppendAssignment("CanRead", property.CanRead);
