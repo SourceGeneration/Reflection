@@ -7,6 +7,8 @@ using System.Threading;
 
 namespace SourceGeneration.Reflection;
 
+#pragma warning disable IDE0305
+
 public partial class ReflectionSourceGenerator
 {
     private static readonly SymbolDisplayFormat GlobalTypeDisplayFormat = new SymbolDisplayFormat(
@@ -34,11 +36,11 @@ public partial class ReflectionSourceGenerator
 
             if (typeSymbol.TypeKind == TypeKind.Enum)
             {
-                yield return PaseEnumType(typeSymbol);
+                yield return PaseEnumType(typeSymbol, cancellationToken);
             }
             else
             {
-                yield return ParseClassType(typeSymbol);
+                yield return ParseClassType(typeSymbol, cancellationToken);
             }
 
             if (typeSymbol.BaseType != null && typeSymbol.BaseType.ContainingAssembly.Equals(assemblySymbol, SymbolEqualityComparer.Default) && !typeSymbols.Contains(typeSymbol.BaseType, SymbolEqualityComparer.Default))
@@ -51,7 +53,7 @@ public partial class ReflectionSourceGenerator
         }
     }
 
-    private static SourceTypeInfo PaseEnumType(INamedTypeSymbol typeSymbol)
+    private static SourceTypeInfo PaseEnumType(INamedTypeSymbol typeSymbol, CancellationToken cancellationToken)
     {
         var fullname = typeSymbol.ToDisplayString(GlobalTypeDisplayFormat);
         SourceTypeInfo typeInfo = new()
@@ -67,13 +69,14 @@ public partial class ReflectionSourceGenerator
 
         foreach (var field in typeSymbol.GetMembers().OfType<IFieldSymbol>())
         {
-            typeInfo.Fields.Add(CreateField(field));
+            cancellationToken.ThrowIfCancellationRequested();
+            typeInfo.Fields.Add(CreateField(field, cancellationToken));
         }
 
         return typeInfo;
     }
 
-    private static SourceTypeInfo ParseClassType(INamedTypeSymbol typeSymbol)
+    private static SourceTypeInfo ParseClassType(INamedTypeSymbol typeSymbol, CancellationToken cancellationToken)
     {
         string fullname;
         bool isGenericTypeDefinition;
@@ -105,119 +108,167 @@ public partial class ReflectionSourceGenerator
             Accessibility = typeSymbol.DeclaredAccessibility,
         };
 
+        var baseType = typeSymbol.BaseType;
+        while (baseType != null)
+        {
+            foreach (var member in baseType.GetMembers().Where(x => !x.IsAbstract && !x.IsOverride))
+            {
+                if (member is IPropertySymbol property)
+                {
+                    if (property.IsRequired)
+                    {
+                        typeInfo.HasBaseRequiredMembers = true;
+                        break;
+                        //var value = property.GetInitializeValue(cancellationToken);
+                        //typeInfo.BaseRequiredMembers.Add(property.Name, value);
+                    }
+                }
+                else if (member is IFieldSymbol field)
+                {
+                    if (field.IsRequired)
+                    {
+                        typeInfo.HasBaseRequiredMembers = true;
+                        break;
+                        //var value = field.GetInitializeValue(cancellationToken);
+                        //typeInfo.BaseRequiredMembers.Add(field.Name, value);
+                    }
+                }
+            }
+            baseType = baseType.BaseType;
+        }
+
 
         var members = typeSymbol.GetMembers();
 
         foreach (var field in members.OfType<IFieldSymbol>())
         {
-            typeInfo.Fields.Add(CreateField(field));
+            cancellationToken.ThrowIfCancellationRequested();
+            typeInfo.Fields.Add(CreateField(field, cancellationToken));
         }
 
         foreach (var property in members.OfType<IPropertySymbol>())
         {
-            SourcePropertyInfo propertyInfo = new()
-            {
-                Name = property.Name,
-                Accessibility = property.DeclaredAccessibility,
-                NullableAnnotation = property.NullableAnnotation,
-                IsVirtual = property.IsVirtual,
-                IsRequired = property.IsRequired,
-                IsAbstract = property.IsAbstract,
-                IsStatic = property.IsStatic,
-                IsIndexer = property.IsIndexer,
-                CanRead = property.GetMethod != null,
-                CanWrite = property.SetMethod != null,
-                IsInitOnly = property.SetMethod?.IsInitOnly == true,
-                GetMethodAccessibility = property.GetMethod?.DeclaredAccessibility ?? Accessibility.NotApplicable,
-                SetMethodAccessibility = property.SetMethod?.DeclaredAccessibility ?? Accessibility.NotApplicable,
-
-                IsGenericDictionaryType = property.Type.IsCompliantGenericDictionaryInterface(),
-                IsGenericEnumerableType = property.Type.IsCompliantGenericEnumerableInterface(),
-
-                PropertyType = property.Type.ToDisplayString(GlobalTypeDisplayFormat),
-                Parameters = property.Parameters.Select(x => new SourceParameterInfo
-                {
-                    Name = x.Name,
-                    ParameterType = x.Type.ToDisplayString(GlobalTypeDisplayFormat),
-                    NullableAnnotation = x.NullableAnnotation,
-                    HasDefaultValue = x.HasExplicitDefaultValue,
-                    HasNestedTypeParameter = x.Type.TypeKind == TypeKind.TypeParameter,
-                    DefaultValue = x.HasExplicitDefaultValue ? x.ExplicitDefaultValue : null,
-                }).ToList(),
-            };
-
-            typeInfo.Properties.Add(propertyInfo);
+            cancellationToken.ThrowIfCancellationRequested();
+            typeInfo.Properties.Add(CreateProperty(property, cancellationToken));
         }
 
         foreach (var constructor in typeSymbol.Constructors)
         {
-            SourceConstructorInfo constructorInfo = new()
-            {
-                Name = constructor.Name,
-                IsStatic = constructor.IsStatic,
-                Accessibility = constructor.DeclaredAccessibility,
-                Parameters = constructor.Parameters.Select(x => new SourceParameterInfo
-                {
-                    Name = x.Name,
-                    ParameterType = x.Type.ToDisplayString(GlobalTypeDisplayFormat),
-                    IsParameterTypeRefLike = x.Type.IsRefLikeType,
-                    IsParameterTypePointer = x.Type.Kind == SymbolKind.PointerType,
-                    NullableAnnotation = x.NullableAnnotation,
-                    HasDefaultValue = x.HasExplicitDefaultValue,
-                    HasNestedTypeParameter = x.Type.TypeKind == TypeKind.TypeParameter,
-                    DefaultValue = x.HasExplicitDefaultValue ? x.ExplicitDefaultValue : null,
-                }).ToList(),
-            };
-            typeInfo.Constructors.Add(constructorInfo);
+            cancellationToken.ThrowIfCancellationRequested();
+            typeInfo.Constructors.Add(CreateConstructor(constructor));
         }
 
         foreach (var method in members.OfType<IMethodSymbol>().Where(x => x.MethodKind == MethodKind.Ordinary && !x.IsImplicitlyDeclared))
         {
-            SourceMethodInfo methodInfo = new()
-            {
-                Name = method.Name,
-                Accessibility = method.DeclaredAccessibility,
-                IsOverride = method.IsOverride,
-                IsVirtual = method.IsVirtual,
-                IsAbstract = method.IsAbstract,
-                IsStatic = method.IsStatic,
-                IsGenericMethod = method.IsGenericMethod,
-                ReturnType = method.ReturnsVoid ? "void" : method.ReturnType.HasTypeParameter() ? null : method.ReturnType.ToDisplayString(GlobalTypeDisplayFormat),
-                ReturnNullableAnnotation = method.ReturnNullableAnnotation,
-                TypeParameters = method.TypeParameters.Select(x => new SourceTypeParameterInfo
-                {
-                    Name = x.Name,
-                    HasUnmanagedTypeConstraint = x.HasUnmanagedTypeConstraint,
-                    HasValueTypeConstraint = x.HasValueTypeConstraint,
-                    HasTypeParameterInConstraintTypes = x.ConstraintTypes.Any(x => x.HasTypeParameter()),
-                    ConstraintTypes = x.ConstraintTypes.Select(x => x.ToDisplayString(GlobalTypeDisplayFormat)).ToArray(),
-                }).ToArray(),
-                Parameters = method.Parameters.Select(x => new SourceParameterInfo
-                {
-                    Name = x.Name,
-                    ParameterType = x.Type.ToDisplayString(GlobalTypeDisplayFormat),
-                    IsParameterTypeRefLike = x.Type.IsRefLikeType,
-                    IsParameterTypePointer = x.Type.Kind == SymbolKind.PointerType,
-                    NullableAnnotation = x.NullableAnnotation,
-                    HasDefaultValue = x.HasExplicitDefaultValue,
-                    IsTypeParameter = x.Type.Kind == SymbolKind.TypeParameter,
-                    HasNestedTypeParameter = x.Type.HasTypeParameter(),
-                    IsRef = x.RefKind == RefKind.Ref,
-                    IsOut = x.RefKind == RefKind.Out,
-                    DefaultValue = x.HasExplicitDefaultValue ? x.ExplicitDefaultValue : null,
-                    DisplayType = x.Type.ToReflectionDisplayString()
-                }).ToList(),
-            };
-
-            typeInfo.Methods.Add(methodInfo);
+            cancellationToken.ThrowIfCancellationRequested();
+            typeInfo.Methods.Add(CreateMethod(method));
         }
 
         return typeInfo;
     }
 
-
-    private static SourceFieldInfo CreateField(IFieldSymbol field)
+    private static SourceMethodInfo CreateMethod(IMethodSymbol method)
     {
+        return new()
+        {
+            Name = method.Name,
+            Accessibility = method.DeclaredAccessibility,
+            IsOverride = method.IsOverride,
+            IsVirtual = method.IsVirtual,
+            IsAbstract = method.IsAbstract,
+            IsStatic = method.IsStatic,
+            IsGenericMethod = method.IsGenericMethod,
+            ReturnType = method.ReturnsVoid ? "void" : method.ReturnType.HasTypeParameter() ? null : method.ReturnType.ToDisplayString(GlobalTypeDisplayFormat),
+            ReturnNullableAnnotation = method.ReturnNullableAnnotation,
+            TypeParameters = method.TypeParameters.Select(x => new SourceTypeParameterInfo
+            {
+                Name = x.Name,
+                HasUnmanagedTypeConstraint = x.HasUnmanagedTypeConstraint,
+                HasValueTypeConstraint = x.HasValueTypeConstraint,
+                HasTypeParameterInConstraintTypes = x.ConstraintTypes.Any(x => x.HasTypeParameter()),
+                ConstraintTypes = x.ConstraintTypes.Select(x => x.ToDisplayString(GlobalTypeDisplayFormat)).ToArray(),
+            }).ToArray(),
+            Parameters = method.Parameters.Select(x => new SourceParameterInfo
+            {
+                Name = x.Name,
+                ParameterType = x.Type.ToDisplayString(GlobalTypeDisplayFormat),
+                IsParameterTypeRefLike = x.Type.IsRefLikeType,
+                IsParameterTypePointer = x.Type.Kind == SymbolKind.PointerType,
+                NullableAnnotation = x.NullableAnnotation,
+                HasDefaultValue = x.HasExplicitDefaultValue,
+                IsTypeParameter = x.Type.Kind == SymbolKind.TypeParameter,
+                HasNestedTypeParameter = x.Type.HasTypeParameter(),
+                IsRef = x.RefKind == RefKind.Ref,
+                IsOut = x.RefKind == RefKind.Out,
+                DefaultValue = x.HasExplicitDefaultValue ? x.ExplicitDefaultValue : null,
+                DisplayType = x.Type.ToReflectionDisplayString()
+            }).ToList(),
+        };
+    }
+
+    private static SourceConstructorInfo CreateConstructor(IMethodSymbol constructor)
+    {
+        return new()
+        {
+            Name = constructor.Name,
+            IsStatic = constructor.IsStatic,
+            Accessibility = constructor.DeclaredAccessibility,
+            Parameters = constructor.Parameters.Select(x => new SourceParameterInfo
+            {
+                Name = x.Name,
+                ParameterType = x.Type.ToDisplayString(GlobalTypeDisplayFormat),
+                IsParameterTypeRefLike = x.Type.IsRefLikeType,
+                IsParameterTypePointer = x.Type.Kind == SymbolKind.PointerType,
+                NullableAnnotation = x.NullableAnnotation,
+                HasDefaultValue = x.HasExplicitDefaultValue,
+                HasNestedTypeParameter = x.Type.TypeKind == TypeKind.TypeParameter,
+                DefaultValue = x.HasExplicitDefaultValue ? x.ExplicitDefaultValue : null,
+            }).ToList(),
+        };
+    }
+
+    private static SourcePropertyInfo CreateProperty(IPropertySymbol property, CancellationToken cancellationToken)
+    {
+        //string defaultValueExpression = property.IsRequired ? property.GetInitializeValue(cancellationToken) :null;
+
+        return new()
+        {
+            Name = property.Name,
+            Accessibility = property.DeclaredAccessibility,
+            NullableAnnotation = property.NullableAnnotation,
+            IsVirtual = property.IsVirtual,
+            IsRequired = property.IsRequired,
+            IsAbstract = property.IsAbstract,
+            IsStatic = property.IsStatic,
+            IsIndexer = property.IsIndexer,
+            CanRead = property.GetMethod != null,
+            CanWrite = property.SetMethod != null,
+            IsInitOnly = property.SetMethod?.IsInitOnly == true,
+            GetMethodAccessibility = property.GetMethod?.DeclaredAccessibility ?? Accessibility.NotApplicable,
+            SetMethodAccessibility = property.SetMethod?.DeclaredAccessibility ?? Accessibility.NotApplicable,
+
+            IsGenericDictionaryType = property.Type.IsCompliantGenericDictionaryInterface(),
+            IsGenericEnumerableType = property.Type.IsCompliantGenericEnumerableInterface(),
+
+            //DefaultValueExpression = defaultValueExpression,
+
+            PropertyType = property.Type.ToDisplayString(GlobalTypeDisplayFormat),
+            Parameters = property.Parameters.Select(x => new SourceParameterInfo
+            {
+                Name = x.Name,
+                ParameterType = x.Type.ToDisplayString(GlobalTypeDisplayFormat),
+                NullableAnnotation = x.NullableAnnotation,
+                HasDefaultValue = x.HasExplicitDefaultValue,
+                HasNestedTypeParameter = x.Type.TypeKind == TypeKind.TypeParameter,
+                DefaultValue = x.HasExplicitDefaultValue ? x.ExplicitDefaultValue : null,
+            }).ToList(),
+        };
+    }
+
+    private static SourceFieldInfo CreateField(IFieldSymbol field, CancellationToken cancellationToken)
+    {
+        //string defaultValueExpression = field.IsRequired ? field.GetInitializeValue(cancellationToken) : null;
+
         return new()
         {
             Name = field.Name,
@@ -233,6 +284,8 @@ public partial class ReflectionSourceGenerator
             IsGenericEnumerableType = field.Type.IsCompliantGenericEnumerableInterface(),
 
             FieldType = field.Type.ToDisplayString(GlobalTypeDisplayFormat),
+
+            //DefaultValueExpression = defaultValueExpression,
         };
     }
 

@@ -391,13 +391,32 @@ public partial class ReflectionSourceGenerator
                 !type.IsRefLikeType &&
                 !constructor.Parameters.Any(x => x.IsParameterTypeRefLike || x.IsParameterTypePointer) &&
                 constructor.Accessibility != Accessibility.Private && constructor.Accessibility != Accessibility.Protected &&
-                !type.Properties.Any(x => x.IsRequired))
+                !type.Properties.Any(x => x.IsRequired) && !type.Fields.Any(x => x.IsRequired) && !type.HasBaseRequiredMembers)
             {
                 builder.AppendIndent();
                 builder.Append($"Invoke = static (parameters) => new {type.FullGlobalName}(");
                 AppendMethodArguments(builder, constructor.Parameters);
                 builder.Append(")");
                 builder.AppendLine();
+
+                //if (type.Fields.Any(x=>x.IsRequired) || type.Properties.Any(x => x.IsRequired) || type.BaseRequiredMembers.Count > 0)
+                //{
+                //    builder.AppendBlock(() =>
+                //    {
+                //        foreach (var property in type.Properties.Where(x => x.IsRequired))
+                //        {
+                //            builder.AppendLine($"{property.Name} = {property.DefaultValueExpression ?? "default"},");
+                //        }
+                //        foreach (var field in type.Fields.Where(x => x.IsRequired))
+                //        {
+                //            builder.AppendLine($"{field.Name} = {field.DefaultValueExpression ?? "default"},");
+                //        }
+                //        foreach (var property in type.BaseRequiredMembers)
+                //        {
+                //            builder.AppendLine($"{property.Key} = {property.Value ?? "default"},");
+                //        }
+                //    });
+                //}
             }
 
         }, ",");
