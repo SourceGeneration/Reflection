@@ -19,9 +19,10 @@ public class UnitTest1
             namespace SourceGeneration.Reflection.Sample2
             {
                 [SourceReflection]
-                public class TestClass
-                {
-                    public T InvokeStructConstraint<T>(T t) where T: struct => t;
+                public class BaseClass 
+                { 
+                    public int A { get; set; }  = 1;
+                    public int B  = 2;
                 }
             }
             """;
